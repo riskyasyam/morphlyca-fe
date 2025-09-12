@@ -59,10 +59,10 @@ const UserTable = () => {
                     <TableHeader>
                         <TableRow className="border-gray-800 hover:bg-gray-900/50">
                             <TableHead className="text-gray-300 font-medium pl-6">Name</TableHead>
+                            <TableHead className="text-gray-300 font-medium pl-6">User ID</TableHead>
                             <TableHead className="text-gray-300 font-medium pl-6">Email</TableHead>
                             <TableHead className="text-gray-300 font-medium pl-6">Role</TableHead>
                             <TableHead className="text-gray-300 font-medium pl-6">Created At</TableHead>
-                            <TableHead className="text-gray-300 font-medium pl-6">User ID</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -70,6 +70,9 @@ const UserTable = () => {
                             <TableRow key={user.id} className="border-gray-800 hover:bg-gray-900/30 transition-colors" >
                                 <TableCell className="font-medium text-white pl-6">
                                     {user.displayName}
+                                </TableCell>
+                                <TableCell className="text-gray-500 font-mono text-xs pl-6">
+                                    {user.id}
                                 </TableCell>
                                 <TableCell className="text-gray-300 pl-6">
                                     {user.email}
@@ -89,9 +92,7 @@ const UserTable = () => {
                                 <TableCell className="text-gray-400 pl-6">
                                     {formatDate(user.createdAt)}
                                 </TableCell>
-                                <TableCell className="text-gray-500 font-mono text-xs pl-6">
-                                    {user.id.slice(0, 8)}...
-                                </TableCell>
+                                
                             </TableRow>
                         ))}
                     </TableBody>

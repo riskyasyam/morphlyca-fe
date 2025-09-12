@@ -1,4 +1,4 @@
-import PlanTable from "@/components/admin/PlanTable";
+import PlanTable from "@/components/admin/plan/PlanTable";
 
 export default function AdminPlan() {
     return (
