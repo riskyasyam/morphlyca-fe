@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { handleLogout } from "@/lib/auth";
+// import { handleLogout } from "@/lib/auth";
 import SearchModal from "./SearchModal";
 import Image from "next/image";
 

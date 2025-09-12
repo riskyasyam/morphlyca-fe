@@ -10,17 +10,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Handler untuk login dengan PrimeAuth
-  const handlePrimeAuthLogin = () => {
-    // Ganti URL PrimeAuth login sesuai environment
-    const callback = `${window.location.origin}/auth/callback`;
-    const params = new URLSearchParams({
-      redirect_uri: callback
-    });
-    // Ganti URL berikut sesuai endpoint PrimeAuth login yang benar
-    window.location.href = `${process.env.NEXT_PUBLIC_PRIMEAUTH_AUTH_SERVICE_URL}/auth/prime/login?${params.toString()}`;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

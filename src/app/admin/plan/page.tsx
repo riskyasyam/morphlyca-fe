@@ -1,8 +1,14 @@
+import PlanTable from "@/components/admin/PlanTable";
+
 export default function AdminPlan() {
     return (
-        <div className="p-8">
-            <h1 className="text-2xl font-bold mb-4 text-white">Plan Management</h1>
-            <p className="text-gray-400">This is the plan management page.</p>
+         <div className="space-y-6">
+            <div>
+                <h1 className="text-3xl font-bold text-white mb-2">Plan Management</h1>
+                <p className="text-gray-400">Manage subscription plans and their details</p>
+            </div>
+            
+            <PlanTable />
         </div>
     );
 }
