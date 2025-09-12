@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -8,6 +9,17 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // Handler untuk login dengan PrimeAuth
+  const handlePrimeAuthLogin = () => {
+    // Ganti URL PrimeAuth login sesuai environment
+    const callback = `${window.location.origin}/auth/callback`;
+    const params = new URLSearchParams({
+      redirect_uri: callback
+    });
+    // Ganti URL berikut sesuai endpoint PrimeAuth login yang benar
+    window.location.href = `${process.env.NEXT_PUBLIC_PRIMEAUTH_AUTH_SERVICE_URL}/auth/prime/login?${params.toString()}`;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,8 +43,12 @@ export default function LoginPage() {
       // Simpan token jika perlu
       // localStorage.setItem("token", data.data.access_token); // opsional
       router.push("/admin/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Terjadi kesalahan");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Terjadi kesalahan");
+      } else {
+        setError("Terjadi kesalahan");
+      }
     } finally {
       setLoading(false);
     }
@@ -47,7 +63,8 @@ export default function LoginPage() {
         <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-white/5 rounded-full blur-2xl"></div>
       </div>
       
-      <form onSubmit={handleSubmit} className="bg-black-900/50 backdrop-blur-sm border border-slate-900 p-8 rounded-xl shadow-2xl w-full max-w-md relative z-10">
+      <div className="w-full max-w-md z-10">
+        <form onSubmit={handleSubmit} className="bg-black-900/50 backdrop-blur-sm border border-slate-900 p-8 rounded-xl shadow-2xl w-full relative">
         <div className="text-center mb-6">
           <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-lg flex items-center justify-center mx-auto mb-4">
             <span className="text-slate-900 font-bold text-xl">S</span>
@@ -82,7 +99,8 @@ export default function LoginPage() {
             {loading ? "Loading..." : "Login"}
           </button>
         </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

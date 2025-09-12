@@ -53,7 +53,7 @@ const mockSearchResults = [
 
 export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   const filteredResults = mockSearchResults.filter(item =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -86,7 +86,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">Search Media</DialogTitle>
         </DialogHeader>
-        
+
         {/* Search Input */}
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -113,7 +113,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
                       {getIcon(item.type)}
                     </div>
-                    
+
                     {/* File info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center space-x-2 mb-1">
@@ -134,7 +134,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             ) : (
               <div className="text-center py-8 text-gray-400">
                 <Search className="w-12 h-12 mx-auto mb-4 text-gray-600" />
-                <p>No results found for "{searchQuery}"</p>
+                <p>No results found for {searchQuery}</p>
               </div>
             )
           ) : (
