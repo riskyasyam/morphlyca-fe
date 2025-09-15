@@ -6,7 +6,7 @@ const AboutSection = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-4xl mb-4">
+          <h2 className="text-4xl font-medium md:text-4xl mb-4">
             Why you should use Morphlyca AI Tool?
           </h2>
           <p className="text-gray-400 text-sm max-w-3xl mx-auto">
