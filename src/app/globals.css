@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -41,6 +42,9 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --color-green-primary: #A0D45B;
+  --color-green-foreground: #DDFFB1;
+  --color-green-secondary: #7EBE2A;
 }
 
 :root {
@@ -112,6 +116,11 @@
   --sidebar-ring: oklch(0.552 0.016 285.938);
 }
 
+*{
+  font-family: "Manrope", sans-serif;
+  scroll-behavior: smooth;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -120,3 +129,5 @@
     @apply bg-background text-foreground;
   }
 }
+
+
