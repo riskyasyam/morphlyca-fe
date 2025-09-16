@@ -4,6 +4,14 @@ import type { MediaAsset, MediaListResponse } from "@/types/media";
 
 const BASE_PATH = "/media-assets/output/facefusion";
 
+
+export const getMediaOutputTotal = async (): Promise<number> => {
+  const res = await api.get<MediaListResponse>("/media-assets/output/facefusion", {
+    params: { skip: 0, take: 1 },
+  });
+  return res.data?.pagination?.total ?? (res.data?.data?.length ?? 0);
+};
+
 export const fetchMediaAssets = async (skip = 0, take = 50): Promise<MediaListResponse> => {
   const res = await api.get(BASE_PATH, { params: { skip, take } });
   return res.data;
