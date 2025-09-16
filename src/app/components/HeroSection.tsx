@@ -20,7 +20,7 @@ export default function HeroSection() {
         </div>
         
         {/* Main Content */}
-        <div className="text-center z-10 mt-20 md:mt-24 lg:mt-32 xl:mt-40 max-w-6xl mx-auto">
+        <div className="text-center z-10 mt-20 md:mt-28 lg:mt-56 lg:mb-20 max-w-6xl mx-auto">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl mb-4 md:mb-6 leading-tight">
             <span className="bg-[linear-gradient(to_right,white,theme(colors.green.secondary),theme(colors.blue.500),white)] text-transparent bg-clip-text">
               Effortless

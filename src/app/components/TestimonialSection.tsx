@@ -35,7 +35,7 @@ const testimonials: Testimonial[] = [
 
 const TestimonialSection: React.FC = () => {
   return (
-    <section className="bg-black text-white py-16 px-6">
+    <section id="testimonials" className="bg-black text-white py-16 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">

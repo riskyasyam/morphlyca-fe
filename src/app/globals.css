@@ -118,6 +118,7 @@
 
 *{
   font-family: "Manrope", sans-serif;
+  scroll-behavior: smooth;
 }
 
 @layer base {

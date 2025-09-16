@@ -12,7 +12,7 @@ export default function Navbar() {
         {/* Logo */}
         <div className="flex-shrink-0">
           <Image 
-            src="/logo/logo.png" 
+            src="/logo/logo.svg" 
             alt="My Website Logo" 
             width={120} 
             height={40} 
@@ -23,9 +23,9 @@ export default function Navbar() {
         {/* Desktop Menu */}
         <ul className="hidden lg:flex gap-8 xl:gap-14 text-white">
           <li><a href="#" className="hover:text-green-400 transition-colors">Home</a></li>
-          <li><a href="#" className="hover:text-green-400 transition-colors">About</a></li>
-          <li><a href="#" className="hover:text-green-400 transition-colors">Pricing</a></li>
-          <li><a href="#" className="hover:text-green-400 transition-colors">Testimonial</a></li>
+          <li><a href="#about" className="hover:text-green-400 transition-colors">About</a></li>
+          <li><a href="#pricing" className="hover:text-green-400 transition-colors">Pricing</a></li>
+          <li><a href="#testimonials" className="hover:text-green-400 transition-colors">Testimonial</a></li>
         </ul>
 
         {/* Desktop CTA Button */}
