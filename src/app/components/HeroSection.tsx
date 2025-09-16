@@ -32,7 +32,7 @@ export default function HeroSection() {
           </p>
           
           <div className="flex justify-center items-center gap-4 mb-12 md:mb-16 lg:mb-20">
-            <button className="w-full sm:w-auto bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary text-black text-sm md:text-base px-6 md:px-8 py-3 md:py-4 rounded-lg hover:opacity-90 transition font-semibold">
+            <button className="w-full sm:w-auto bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary text-black text-sm md:text-base px-6 md:px-8 py-3 md:py-4 rounded-lg hover:opacity-90 transition font-semibold shadow-[-20px_4px_40px_0px_#DBFFAA40]">
               Get Started Free
             </button>
             <button className="w-full sm:w-auto bg-gradient-to-r from-gray-600 to-gray-800 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg hover:opacity-90 transition text-sm md:text-base">

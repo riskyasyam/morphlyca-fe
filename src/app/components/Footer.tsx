@@ -16,8 +16,8 @@ const Footer = () => {
             
             {/* Subscribe Section */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Subscribe</h3>
-              <p className="text-gray-600 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">Subscribe</h3>
+              <p className="text-gray-600 text-sm mb-6">
                 Join our newsletter to stay up to date on feature and releases.
               </p>
               

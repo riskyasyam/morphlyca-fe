@@ -17,7 +17,7 @@ const AboutSection = () => {
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-[#1B1F23] rounded-2xl p-6 border border-gray-700 hover:border-gray-700 transition-colors">
+          <div className="bg-[#1B1F23] rounded-2xl p-6 border border-gray-700 hover:border-gray-500 hover:shadow-[0px_5px_20px_5px_#DBFFAA40] transition-colors">
             {/* Feature Image/Icon Area */}
             <div className="mb-6">
               <div className="w-full h-44 bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
@@ -39,7 +39,7 @@ const AboutSection = () => {
             </div>
           </div>
 
-          <div className="bg-[#1B1F23] rounded-2xl p-6 border border-gray-700 hover:border-gray-700 transition-colors">
+          <div className="bg-[#1B1F23] rounded-2xl p-6 border border-gray-700 hover:border-gray-500 hover:shadow-[0px_5px_20px_5px_#DBFFAA40] transition-colors">
             {/* Feature Image/Icon Area */}
             <div className="mb-6">
               <div className="w-full h-44 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-lg gap-2 flex items-center justify-center overflow-hidden">
@@ -75,7 +75,7 @@ const AboutSection = () => {
             </div>
           </div>
 
-          <div className="bg-[#1B1F23] rounded-2xl p-6 border border-gray-700 hover:border-gray-700 transition-colors">
+          <div className="bg-[#1B1F23] rounded-2xl p-6 border border-gray-700 hover:border-gray-500 hover:shadow-[0px_5px_20px_5px_#DBFFAA40] transition-colors">
             {/* Feature Image/Icon Area */}
             <div className="mb-6">
               <div className="w-full h-44 bg-[#1B1F23] rounded-lg flex items-center justify-center overflow-hidden">
@@ -96,7 +96,7 @@ const AboutSection = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-6">
-             <div className="bg-[#1B1F23] rounded-2xl p-6 border border-gray-700 hover:border-gray-700 transition-colors">
+             <div className="bg-[#1B1F23] rounded-2xl p-6 border border-gray-700 hover:border-gray-500 hover:shadow-[0px_5px_20px_5px_#DBFFAA40] transition-colors">
             {/* Feature Image/Icon Area */}
             <div className="mb-6">
               <div className="w-full relative h-44 bg-[#1B1F23] rounded-lg flex justify-center overflow-hidden">
@@ -131,7 +131,7 @@ const AboutSection = () => {
               </p>
             </div>
           </div>
-           <div className="bg-[#1B1F23] rounded-2xl p-6 border border-gray-700 hover:border-gray-700 transition-colors">
+           <div className="bg-[#1B1F23] rounded-2xl p-6 border border-gray-700 hover:border-gray-500 hover:shadow-[0px_5px_20px_5px_#DBFFAA40] transition-colors">
             {/* Feature Image/Icon Area */}
             <div className="mb-6">
               <div className="w-full h-44 bg-[#1B1F23] rounded-lg flex items-center justify-center overflow-hidden">

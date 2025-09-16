@@ -2,7 +2,8 @@ import React from 'react';
 
 const PricingSection = () => {
   return (
-    <section id='pricing' className="bg-black text-white py-20 px-4">
+    <section id='pricing' className="bg-black overflow-hidden relative text-white py-20 px-4">
+        <div className="absolute top-0 right-[-100px] w-96 h-96 bg-gray-500/20 rounded-full blur-3xl"></div>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
@@ -17,7 +18,7 @@ const PricingSection = () => {
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Basic Plan */}
-          <div className="relative rounded-2xl p-8 border border-gray-700 bg-[url('/images/basic-plan.png')] backdrop-blur-sm">
+          <div className="relative rounded-2xl p-8 border border-gray-700 bg-[url('/images/basic-plan.png')] backdrop-blur-sm hover:scale-[1.03] transition-transform ">
             <div className="mb-6">
               <h3 className="text-white/80 text-sm mb-2">Basic Plan</h3>
               <div className="text-4xl font-bold mb-2">Free</div>
@@ -51,7 +52,7 @@ const PricingSection = () => {
           </div>
 
           {/* Premium Plan */}
-          <div className="relative rounded-2xl p-8 border border-gray-700 bg-[url('/images/basic-plan.png')] backdrop-blur-sm">
+          <div className="relative rounded-2xl p-8 border border-gray-700 bg-[url('/images/basic-plan.png')] backdrop-blur-sm hover:scale-[1.03] transition-transform">
             <div className="mb-6">
               <h3 className="text-white/80 text-sm mb-2">Premium Plan</h3>
               <div className="text-4xl font-bold mb-1">
@@ -87,7 +88,7 @@ const PricingSection = () => {
           </div>
 
           {/* Professional Plan */}
-          <div className="relative rounded-2xl p-8 border border-gray-700 bg-[url('/images/basic-plan.png')] backdrop-blur-sm">
+          <div className="relative rounded-2xl p-8 border border-gray-700 bg-[url('/images/basic-plan.png')] backdrop-blur-sm hover:scale-[1.03] transition-transform">
             <div className="mb-6">
               <h3 className="text-white/80 text-sm mb-2">Professional Plan</h3>
               <div className="text-4xl font-bold mb-1">

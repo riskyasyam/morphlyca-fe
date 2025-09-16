@@ -29,7 +29,7 @@ export default function Navbar() {
         </ul>
 
         {/* Desktop CTA Button */}
-        <button className="hidden lg:block px-4 xl:px-6 py-2 text-xs xl:text-[13px] font-medium text-dark bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary rounded-lg hover:opacity-90 transition-opacity duration-200">
+        <button className="hidden lg:block px-4 xl:px-6 py-4 text-xs xl:text-[13px] font-medium text-dark bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary rounded-lg hover:opacity-90 transition-opacity duration-200 shadow-[-20px_4px_40px_0px_#DBFFAA40]">
           Get Started
         </button>
 
@@ -53,11 +53,11 @@ export default function Navbar() {
         <div className="lg:hidden bg-gray-900/95 backdrop-blur-sm border-t border-gray-700">
           <ul className="flex flex-col space-y-4 px-4 py-6 text-white">
             <li><a href="#" className="block hover:text-green-400 transition-colors">Home</a></li>
-            <li><a href="#" className="block hover:text-green-400 transition-colors">About</a></li>
-            <li><a href="#" className="block hover:text-green-400 transition-colors">Pricing</a></li>
-            <li><a href="#" className="block hover:text-green-400 transition-colors">Testimonial</a></li>
+            <li><a href="#about" className="block hover:text-green-400 transition-colors">About</a></li>
+            <li><a href="#pricing" className="block hover:text-green-400 transition-colors">Pricing</a></li>
+            <li><a href="#testimonials" className="block hover:text-green-400 transition-colors">Testimonial</a></li>
             <li className="pt-4">
-              <button className="w-full px-6 py-3 text-sm font-medium text-dark bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary rounded-lg hover:opacity-90 transition-opacity duration-200">
+              <button className="w-full px-6 py-3 text-sm font-medium text-black bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary shadow-[-20px_4px_40px_0px_#DBFFAA40] rounded-lg hover:opacity-90 transition-opacity duration-200">
                 Get Started
               </button>
             </li>
