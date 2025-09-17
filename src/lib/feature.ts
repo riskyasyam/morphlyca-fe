@@ -71,32 +71,75 @@ export const deleteFeature = async (id: string | number): Promise<void> => {
 
 // Get model categories
 export async function getModelCategories(): Promise<string[]> {
-  const response = await api.get("/features/model-categories", {
-    method: "GET",
-  });
-  return response.data;
+  try {
+    const res = await api.get("/features/model-categories");
+    return res.data;
+  } catch (error: any) {
+    // If endpoint doesn't exist (400/404), return static categories
+    if (error?.response?.status === 400 || error?.response?.status === 404) {
+      console.log("Model categories endpoint not available, using static fallback");
+      return [
+        "face_swapper_model",
+        "face_enhancer_model", 
+        "frame_enhancer_model",
+        "face_detector_model",
+        "expression_restorer_model",
+        "face_editor_model",
+        "frame_colorizer_model",
+        "lip_syncer_model",
+        "deep_swapper_model"
+      ];
+    }
+    console.error("Model categories endpoint error:", error);
+    // For other errors, still return static fallback
+    return [
+      "face_swapper_model",
+      "face_enhancer_model", 
+      "frame_enhancer_model",
+      "face_detector_model",
+      "expression_restorer_model",
+      "face_editor_model",
+      "frame_colorizer_model",
+      "lip_syncer_model",
+      "deep_swapper_model"
+    ];
+  }
 }
 
 // Get models by category
 export async function getModelsByCategory(category: string): Promise<Feature[]> {
-  const response = await api.get(`/features/processor-options/category/${category}`, {
-    method: "GET",
-  });
-  return response.data;
+  try {
+    const res = await api.get(`/features/processor-options/category/${category}`);
+    return res.data;
+  } catch (error: any) {
+    // If endpoint doesn't exist, return empty array (will use static fallback)
+    if (error?.response?.status === 400 || error?.response?.status === 404) {
+      console.log(`Models for category ${category} endpoint not available`);
+      return [];
+    }
+    console.error(`Models for category ${category} error:`, error);
+    return [];
+  }
 }
 
 // Get core processors
 export async function getCoreProcessors(): Promise<Feature[]> {
-  const response = await api.get("/features/core-processors", {
-    method: "GET",
-  });
-  return response.data;
+  try {
+    const res = await api.get("/features/core-processors");
+    return res.data;
+  } catch (error) {
+    console.error("Core processors endpoint not available:", error);
+    return [];
+  }
 }
 
 // Get all processor options
 export async function getAllProcessorOptions(): Promise<Feature[]> {
-  const response = await api.get("/features/processor-options", {
-    method: "GET",
-  });
-  return response.data;
+  try {
+    const res = await api.get("/features/processor-options");
+    return res.data;
+  } catch (error) {
+    console.error("Processor options endpoint not available:", error);
+    return [];
+  }
 }

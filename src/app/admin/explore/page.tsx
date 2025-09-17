@@ -263,7 +263,28 @@ export default function ExplorePage() {
   const loadModelOptions = async () => {
     setLoadingModels(true);
     try {
-      // Try to load from API first
+      // Always use static model options as fallback since API endpoints may not be available yet
+      console.warn("Using static model options (API endpoints not implemented yet)");
+      
+      // Fallback to static model options
+      const staticModelData: Record<string, Feature[]> = {};
+      Object.entries(MODEL_OPTIONS).forEach(([category, models]) => {
+        staticModelData[category] = models.map((model, index) => ({
+          id: index + 1,
+          name: `${category}_${model.value}`,
+          value: model.value,
+          type: "processor_option" as const,
+          status: "ACTIVE" as const,
+          weight: 0,
+          createdAt: new Date().toISOString(),
+          category: category
+        }));
+      });
+      
+      setModelOptions(staticModelData);
+      console.log("Using static model options:", staticModelData);
+      
+      // Optional: Try to load from API but don't fail if it doesn't work
       try {
         const categories = await getModelCategories();
         const modelData: Record<string, Feature[]> = {};
@@ -271,49 +292,25 @@ export default function ExplorePage() {
         for (const category of categories) {
           try {
             const models = await getModelsByCategory(category);
-            modelData[category] = models;
+            if (models && models.length > 0) {
+              modelData[category] = models;
+            }
           } catch (err) {
             console.error(`Error loading models for category ${category}:`, err);
-            // Fallback to static data for this category
-            const staticModels = MODEL_OPTIONS[category as keyof typeof MODEL_OPTIONS] || [];
-            modelData[category] = staticModels.map((model, index) => ({
-              id: index + 1,
-              name: `${category}_${model.value}`,
-              value: model.value,
-              type: "processor_option" as const,
-              status: "ACTIVE" as const,
-              weight: 0,
-              createdAt: new Date().toISOString(),
-              category: category
-            }));
+            // Keep using static data for this category
           }
         }
         
-        setModelOptions(modelData);
-        console.log("Model options loaded from API:", modelData);
+        // Only update if we got data from API
+        if (Object.keys(modelData).length > 0) {
+          setModelOptions(prev => ({ ...prev, ...modelData }));
+          console.log("Model options updated from API:", modelData);
+        }
       } catch (apiError) {
-        console.warn("API endpoints not available, using static model options:", apiError);
-        
-        // Fallback to static model options
-        const staticModelData: Record<string, Feature[]> = {};
-        Object.entries(MODEL_OPTIONS).forEach(([category, models]) => {
-          staticModelData[category] = models.map((model, index) => ({
-            id: index + 1,
-            name: `${category}_${model.value}`,
-            value: model.value,
-            type: "processor_option" as const,
-            status: "ACTIVE" as const,
-            weight: 0,
-            createdAt: new Date().toISOString(),
-            category: category
-          }));
-        });
-        
-        setModelOptions(staticModelData);
-        console.log("Using static model options:", staticModelData);
+        console.warn("API endpoints not available, continuing with static options:", apiError);
       }
     } catch (err) {
-      console.error("Error loading model options:", err);
+      console.error("Error setting up model options:", err);
       // Set empty model options as last resort
       setModelOptions({});
     } finally {
@@ -451,10 +448,16 @@ export default function ExplorePage() {
   }, [sourcePreview, targetPreview, audioPreview]);
 
   // kirim job
-  const canSubmit = !!sourceFile && !!targetFile && totalSelectedWeight > 0 && !submitting;
+  const canSubmit = !!sourceFile && !!targetFile && totalSelectedWeight > 0 && !submitting && totalSelectedWeight <= (quota?.remaining ?? 0);
 
   const handleSubmit = async () => {
     if (!sourceFile || !targetFile) return;
+
+    // Check quota before submission
+    if (totalSelectedWeight > (quota?.remaining ?? 0)) {
+      alert(`Insufficient quota. You need ${totalSelectedWeight} but only have ${quota?.remaining ?? 0} remaining.`);
+      return;
+    }
 
     // Validate required models for selected processors
     const validationErrors: string[] = [];
@@ -468,8 +471,10 @@ export default function ExplorePage() {
         if (['face_enhancer', 'frame_enhancer', 'expression_restorer', 'face_editor', 'frame_colorizer', 'lip_syncer', 'deep_swapper'].includes(processor)) {
           const hasModelValue = featureValues[modelField] || globalOptions[modelField];
           const categoryModels = modelOptions[modelField] || [];
+          const fallbackModels = MODEL_OPTIONS[modelField as keyof typeof MODEL_OPTIONS] || [];
+          const availableModels = categoryModels.length > 0 ? categoryModels : fallbackModels;
           
-          if (!hasModelValue && categoryModels.length > 0) {
+          if (!hasModelValue && availableModels.length > 0) {
             validationErrors.push(`${processor.replace('_', ' ')} requires a model selection`);
           }
         }
@@ -486,32 +491,55 @@ export default function ExplorePage() {
     setJob(null);
 
     try {
-      // Prepare the job payload according to backend API
-      const jobPayload = {
-        processors: selectedProcessors,
-        options: {
-          ...globalOptions,
-          ...featureValues,
-          // Face editor params need to be structured properly
-          ...(featureValues.face_editor_model && {
-            faceEditorParams: {
-              eyeOpenRatio: featureValues.face_editor_eye_open_ratio || 1.0,
-              mouthSmile: featureValues.face_editor_mouth_smile || 0.0,
-              headYaw: featureValues.face_editor_head_yaw || 0.0,
-              headPitch: featureValues.face_editor_head_pitch || 0.0,
-              headRoll: featureValues.face_editor_head_roll || 0.0,
-              eyeGazeHorizontal: featureValues.face_editor_eye_gaze_horizontal || 0.0,
-              eyeGazeVertical: featureValues.face_editor_eye_gaze_vertical || 0.0,
-              lipOpenRatio: featureValues.face_editor_lip_open_ratio || 1.0,
-              mouthGrim: featureValues.face_editor_mouth_grim || 0.0,
-              mouthPout: featureValues.face_editor_mouth_pout || 0.0,
-              mouthPositionHorizontal: featureValues.face_editor_mouth_position_horizontal || 0.0,
-              mouthPositionVertical: featureValues.face_editor_mouth_position_vertical || 0.0,
-              eyebrowDirection: featureValues.face_editor_eyebrow_direction || 0.0
-            }
-          })
+      // Prepare options with proper field names for backend
+      const processedOptions: Record<string, any> = {};
+      
+      // Map frontend option names to backend field names
+      Object.entries(featureValues).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          // Convert face_swapper_model to faceSwapperModel format
+          if (key.includes('_model')) {
+            const camelCaseKey = key.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
+            processedOptions[camelCaseKey] = value;
+          }
+          // Convert other snake_case to camelCase
+          else if (key.includes('_')) {
+            const camelCaseKey = key.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
+            processedOptions[camelCaseKey] = value;
+          }
+          else {
+            processedOptions[key] = value;
+          }
         }
-      };
+      });
+
+      // Add global options with proper field names
+      Object.entries(globalOptions).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          processedOptions[key] = value;
+        }
+      });
+
+      // Handle face editor params specially
+      if (featureValues.face_editor_model) {
+        const faceEditorParams: Record<string, number> = {};
+        
+        Object.entries(featureValues).forEach(([key, value]) => {
+          if (key.startsWith('face_editor_') && !key.includes('model') && typeof value === 'number') {
+            // Convert face_editor_eye_open_ratio to eyeOpenRatio
+            const paramKey = key.replace('face_editor_', '').replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
+            faceEditorParams[paramKey] = value;
+          }
+        });
+
+        if (Object.keys(faceEditorParams).length > 0) {
+          processedOptions.faceEditorParams = faceEditorParams;
+        }
+      }
+
+      console.log("Submitting job payload:");
+      console.log("- Processors:", selectedProcessors);
+      console.log("- Options:", processedOptions);
 
       // Create FormData for file upload
       const form = new FormData();
@@ -519,8 +547,21 @@ export default function ExplorePage() {
       form.append("target", targetFile);
       if (audioFile) form.append("audio", audioFile);
       
-      // Add job data as JSON string
-      form.append("jobData", JSON.stringify(jobPayload));
+      // Backend expects processors as JSON string and options as JSON string
+      form.append("processors", JSON.stringify(selectedProcessors));
+      if (Object.keys(processedOptions).length > 0) {
+        form.append("options", JSON.stringify(processedOptions));
+      }
+
+      // Log form data for debugging
+      console.log("Form data being sent:");
+      form.forEach((value, key) => {
+        if (value instanceof File) {
+          console.log(`- ${key}: File(${value.name}, ${value.size} bytes)`);
+        } else {
+          console.log(`- ${key}: ${value}`);
+        }
+      });
 
       const { id } = await createUploadedProcess(form);
       setJobId(id);
@@ -529,7 +570,32 @@ export default function ExplorePage() {
       // Refresh job history immediately after creating new job
       await fetchJobHistory();
     } catch (e: any) {
-      alert(e?.message ?? "Gagal membuat job");
+      console.error("Job submission error:", e);
+      
+      // Better error handling with specific messaging
+      let errorMessage = "Failed to create job";
+      
+      if (e?.message?.includes('quota') || e?.message?.includes('Quota')) {
+        // Refresh quota data
+        try {
+          const updatedQuota = await fetchQuotaToday();
+          setQuota(updatedQuota);
+        } catch {}
+        
+        errorMessage = `Insufficient quota: ${e.message}\n\nPlease wait for your quota to reset or upgrade your plan.`;
+      } else if (e?.message?.includes('permission') || e?.message?.includes('Permission')) {
+        errorMessage = `Permission denied: ${e.message}\n\nPlease check your account permissions.`;
+      } else if (e?.message?.includes('Validation')) {
+        errorMessage = `Validation error: ${e.message}`;
+      } else if (e?.response?.data?.message) {
+        errorMessage = e.response.data.message;
+      } else if (e?.response?.data?.errors) {
+        errorMessage = "Validation errors:\n" + e.response.data.errors.join('\n');
+      } else if (e?.message) {
+        errorMessage = e.message;
+      }
+      
+      alert(errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -579,7 +645,7 @@ export default function ExplorePage() {
   const renderModelSelector = (processorName: string, feature: Feature) => {
     const categoryModels = modelOptions[feature.name] || [];
     
-    // Fallback to static options if no API data
+    // Always fallback to static options if no API data
     const fallbackModels = MODEL_OPTIONS[feature.name as keyof typeof MODEL_OPTIONS] || [];
     const modelsToUse = categoryModels.length > 0 ? categoryModels : fallbackModels.map((model, index) => ({
       id: index + 1,
@@ -618,7 +684,7 @@ export default function ExplorePage() {
         {!loadingModels && modelsToUse.length === 0 && (
           <p className="text-xs text-yellow-400">No models available</p>
         )}
-        {!featureValues[feature.name] && !feature.value && (
+        {!featureValues[feature.name] && !feature.value && modelsToUse.length > 0 && (
           <p className="text-xs text-red-400">Required for {processorName.replace('_', ' ')}</p>
         )}
       </div>
@@ -667,11 +733,16 @@ export default function ExplorePage() {
               disabled={!canSubmit}
               style={gradientButtonStyle}
               className="font-semibold disabled:opacity-60"
+              title={totalSelectedWeight > (quota?.remaining ?? 0) ? "Insufficient quota" : ""}
             >
               {submitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin mr-2" />
                   Processing...
+                </>
+              ) : totalSelectedWeight > (quota?.remaining ?? 0) ? (
+                <>
+                  Insufficient Quota
                 </>
               ) : (
                 <>
