@@ -8,6 +8,7 @@ export interface Job {
   createdAt?: string;
   finishedAt?: string | null;
   error?: string | null;
+  resultUrl?: string;
   // tambahkan field lain sesuai backend (output, logs, dll) bila perlu
 }
 

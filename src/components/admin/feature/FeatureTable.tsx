@@ -158,7 +158,9 @@ export default function FeatureTable() {
                         <TableHeader className="sticky top-0 z-10 bg-black/90 backdrop-blur supports-[backdrop-filter]:bg-black/60">
                             <TableRow className="border-gray-800">
                                 <TableHead className="text-gray-300 font-medium pl-6">Name</TableHead>
+                                <TableHead className="text-gray-300 font-medium">Value</TableHead>
                                 <TableHead className="text-gray-300 font-medium">Type</TableHead>
+                                <TableHead className="text-gray-300 font-medium">Category</TableHead>
                                 <TableHead className="text-gray-300 font-medium">Status</TableHead>
                                 <TableHead className="text-gray-300 font-medium">Weight</TableHead>
                                 <TableHead className="text-gray-300 font-medium">Created At</TableHead>
@@ -171,7 +173,25 @@ export default function FeatureTable() {
                             {filtered.map((f) => (
                                 <TableRow key={f.id} className="border-gray-800 hover:bg-gray-900/30 transition-colors">
                                     <TableCell className="font-medium text-white pl-6">{f.name}</TableCell>
+                                    <TableCell className="text-gray-300 max-w-32">
+                                        {f.value ? (
+                                            <span className="truncate block" title={f.value}>
+                                                {f.value}
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-500 italic">-</span>
+                                        )}
+                                    </TableCell>
                                     <TableCell className="text-gray-300">{f.type}</TableCell>
+                                    <TableCell className="text-gray-300">
+                                        {f.category ? (
+                                            <span className="text-xs bg-blue-600/20 text-blue-300 px-2 py-1 rounded">
+                                                {f.category}
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-500 italic">-</span>
+                                        )}
+                                    </TableCell>
                                     <TableCell>
                                         <Badge className={statusBadgeClass(f.status)}>{f.status}</Badge>
                                     </TableCell>
@@ -210,7 +230,7 @@ export default function FeatureTable() {
 
                             {filtered.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="text-center py-10 text-gray-400">
+                                    <TableCell colSpan={9} className="text-center py-10 text-gray-400">
                                         {query ? "No features match your search." : "No features found."}
                                     </TableCell>
                                 </TableRow>

@@ -116,10 +116,14 @@ export default function AdminHome() {
       <div className="relative z-[60] pointer-events-auto text-white">
         <h2 className="text-3xl font-bold mb-6">Welcome to Admin Dashboard</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 3 }).map((_, i) => (
+          {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
               className="h-32 bg-gray-900 border border-gray-800 rounded-lg animate-pulse"
+              style={{
+                animationDelay: `${i * 0.1}s`,
+                animationDuration: '1.5s'
+              }}
             />
           ))}
         </div>
@@ -129,7 +133,7 @@ export default function AdminHome() {
 
   return (
     <div className="relative z-[60] pointer-events-auto text-white space-y-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-4 opacity-0 animate-fade-in">
         <div>
           <h2 className="text-3xl font-bold mb-1">Welcome, {me?.displayName ?? "User"}</h2>
           <p className="text-slate-400">
@@ -154,9 +158,15 @@ export default function AdminHome() {
         </Button>
       </div>
 
-      {/* KPI cards */}
+      {/* KPI cards dengan animasi fade-in bertingkat */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+        <div 
+          className="bg-gray-900 border border-gray-800 rounded-lg p-6 opacity-0 animate-fade-in-up transform translate-y-4"
+          style={{ 
+            animationDelay: '0.1s',
+            animationFillMode: 'forwards'
+          }}
+        >
           <h3 className="text-sm text-slate-300 mb-2">Current Plan</h3>
           <p className="text-xl font-semibold">
             {subscription?.planName ? `${subscription.planName} (${subscription.planCode})` : "Free Plan"}
@@ -174,7 +184,13 @@ export default function AdminHome() {
           </div>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+        <div 
+          className="bg-gray-900 border border-gray-800 rounded-lg p-6 opacity-0 animate-fade-in-up transform translate-y-4"
+          style={{ 
+            animationDelay: '0.2s',
+            animationFillMode: 'forwards'
+          }}
+        >
           <h3 className="text-sm text-slate-300 mb-2">Daily Weight Quota</h3>
           <p className="text-3xl font-bold">{fmt(entitlements?.daily_weight_quota || quotaToday?.remaining)}</p>
           <p className="text-xs text-slate-400 mt-1">
@@ -205,7 +221,13 @@ export default function AdminHome() {
           </p>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+        <div 
+          className="bg-gray-900 border border-gray-800 rounded-lg p-6 opacity-0 animate-fade-in-up transform translate-y-4"
+          style={{ 
+            animationDelay: '0.3s',
+            animationFillMode: 'forwards'
+          }}
+        >
           <h3 className="text-sm text-slate-300 mb-2">Plan Limits</h3>
           <div className="space-y-1">
             <div className="flex justify-between text-xs">
@@ -230,9 +252,15 @@ export default function AdminHome() {
         </div>
       </div>
 
-      {/* Chart sederhana untuk status jobs */}
+      {/* Chart section dengan animasi */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+        <div 
+          className="bg-gray-900 border border-gray-800 rounded-lg p-6 opacity-0 animate-fade-in-up transform translate-y-4"
+          style={{ 
+            animationDelay: '0.4s',
+            animationFillMode: 'forwards'
+          }}
+        >
           <h3 className="text-lg font-semibold mb-4">Job Status Distribution</h3>
           <div className="space-y-3">
             {['SUCCEEDED', 'FAILED', 'RUNNING', 'QUEUED'].map(status => {
@@ -260,7 +288,13 @@ export default function AdminHome() {
           </div>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+        <div 
+          className="bg-gray-900 border border-gray-800 rounded-lg p-6 opacity-0 animate-fade-in-up transform translate-y-4"
+          style={{ 
+            animationDelay: '0.5s',
+            animationFillMode: 'forwards'
+          }}
+        >
           <h3 className="text-lg font-semibold mb-4">Most Used Processors</h3>
           <div className="flex items-center justify-center">
             {/* Donut Chart untuk processor usage */}
@@ -351,9 +385,16 @@ export default function AdminHome() {
                         className="w-3 h-3 rounded-full" 
                         style={{ backgroundColor: colors[index] }}
                       />
-                      <span className="text-slate-300 truncate max-w-20">{processor}</span>
+                      <span className="text-slate-300 truncate max-w-24" title={processor}>
+                        {processor.replace(/_/g, ' ')}
+                      </span>
                     </div>
-                    <span className="text-slate-400">{count}</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-400">{count}</span>
+                      <span className="text-xs text-slate-500">
+                        ({((count / Object.values(processorCounts).reduce((sum, c) => sum + c, 0)) * 100).toFixed(0)}%)
+                      </span>
+                    </div>
                   </div>
                 ));
             })()}
@@ -365,8 +406,14 @@ export default function AdminHome() {
         </div>
       </div>
 
-      {/* Recent jobs table - smaller and with pagination */}
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
+      {/* Recent jobs table dengan animasi */}
+      <div 
+        className="bg-gray-900 border border-gray-800 rounded-lg p-4 opacity-0 animate-fade-in-up transform translate-y-4"
+        style={{ 
+          animationDelay: '0.6s',
+          animationFillMode: 'forwards'
+        }}
+      >
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-semibold">Recent Jobs</h3>
           <a
