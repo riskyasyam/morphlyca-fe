@@ -1,10 +1,11 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+// This file is deprecated - entitlements are now managed in /admin/entitlements
+// Please use the new entitlements management page instead
+import { DialogHeader } from "@/components/ui/dialog";
 import { fetchPlanById } from "@/lib/plan";
 import type { PlanDetail } from "@/types/plan";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@radix-ui/react-dialog";
 import { Loader2, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface Props {
   open: boolean;

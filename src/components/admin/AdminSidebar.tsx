@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Search, Compass, Library, LogOut, Home, User, Podcast, Notebook, Cpu } from "lucide-react";
+import { Search, Compass, Library, LogOut, Home, User, Podcast, Notebook, Cpu, Crown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -16,6 +16,7 @@ export default function AdminSidebar() {
     { icon: Home, label: "Dashboard", href: "/admin/dashboard" },
     { icon: User, label: "User", href: "/admin/user" },
     { icon: Notebook, label: "Plan", href: "/admin/plan" },
+    { icon: Crown, label: "Entitlements", href: "/admin/entitlements" },
     { icon: Cpu, label: "Feature", href: "/admin/feature" },
     { icon: Podcast, label: "Subscription", href: "/admin/subscription" },
     { icon: Compass, label: "Explore", href: "/admin/explore" },
@@ -24,7 +25,8 @@ export default function AdminSidebar() {
 
   const handleLogout = async () => {
     try {
-      await handleLogout(); router.push("/");
+      // await handleLogout(); 
+      router.push("/");
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -33,11 +35,14 @@ export default function AdminSidebar() {
   return (
     <div className="w-60 bg-black h-screen fixed left-0 top-0 z-50 border-r border-gray-800">
       {/* Logo */}
-      <div className="p-6"> <div className="flex items-center">
-        <div>
-          <Image src="/logo/logo.svg" alt="Morpylica" width={150} height={60} /> </div>
+      <div className="p-6">
+        <div className="flex items-center">
+          <div>
+            <Image src="/logo/logo.svg" alt="Morpylica" width={150} height={60} />
+          </div>
+        </div>
       </div>
-      </div>
+
       {/* Search */}
       <div className="p-4">
         <div className="relative cursor-pointer" onClick={() => setIsSearchModalOpen(true)}>
@@ -45,6 +50,7 @@ export default function AdminSidebar() {
           <Input placeholder="Search..." className="pl-10 bg-gray-900 border-gray-700 text-white placeholder-gray-400 focus:border-gray-600 cursor-pointer" readOnly />
         </div>
       </div>
+
       {/* Menu Items */}
       <nav className="px-4 space-y-2">
         <div>
@@ -64,6 +70,7 @@ export default function AdminSidebar() {
               </Link>
             ))}
         </div>
+
         {/* Admin Management */}
         <div>
           <p className="text-xs font-semibold text-gray-500 uppercase mb-2">
@@ -71,7 +78,7 @@ export default function AdminSidebar() {
           </p>
           {menuItems
             .filter((item) =>
-              ["User", "Subscription", "Plan", "Feature"].includes(item.label)
+              ["User", "Subscription", "Plan", "Entitlements", "Feature"].includes(item.label)
             )
             .map((item, index) => (
               <Link key={index} href={item.href}>
@@ -107,14 +114,20 @@ export default function AdminSidebar() {
               </Link>
             ))}
         </div>
-
       </nav>
+
       {/* Logout */}
       <div className="absolute bottom-4 left-4 right-4">
-        <Button variant="ghost" onClick={handleLogout} className="w-full justify-start text-gray-400 hover:text-red-400 hover:bg-gray-800 transition-colors cursor-pointer" >
-          <LogOut className="w-5 h-5 mr-3" /> Logout
+        <Button 
+          variant="ghost" 
+          onClick={handleLogout} 
+          className="w-full justify-start text-gray-400 hover:text-red-400 hover:bg-gray-800 transition-colors cursor-pointer"
+        >
+          <LogOut className="w-5 h-5 mr-3" /> 
+          Logout
         </Button>
       </div>
+
       {/* Search Modal */}
       <SearchModal isOpen={isSearchModalOpen} onClose={() => setIsSearchModalOpen(false)} />
     </div>

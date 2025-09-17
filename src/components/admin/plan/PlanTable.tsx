@@ -8,10 +8,9 @@ import {
 } from "@/components/ui/table";
 import type { Plan, PlansListResponse } from "@/types/plan";
 import { fetchPlans, deletePlan } from "@/lib/plan";
-import { Loader2, Pencil, Trash2, Plus, Eye, PlusCircle } from "lucide-react";
+import { Loader2, Pencil, Trash2, Plus, Crown } from "lucide-react";
 import PlanFormModal from "@/components/admin/plan/PlanFormModal";
-import EntitlementsFormModal from "@/components/admin/plan/EntitlementsFormModal";
-import EntitlementsViewModal from "@/components/admin/plan/EntitlementsViewModal";
+import Link from "next/link";
 
 const PlanTable = () => {
     const [plans, setPlans] = useState<Plan[]>([]);
@@ -25,18 +24,6 @@ const PlanTable = () => {
     const [modalMode, setModalMode] = useState<"create" | "edit">("create");
     const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
 
-    const [addEntOpen, setAddEntOpen] = useState(false);
-    const [viewEntOpen, setViewEntOpen] = useState(false);
-    const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
-
-    const openViewEntitlements = (planId: number) => {
-        setSelectedPlanId(planId);
-        setViewEntOpen(true);
-    };
-    const openAddEntitlements = (planId: number) => {
-        setSelectedPlanId(planId);
-        setAddEntOpen(true);
-    };
     const loadPlans = async () => {
         try {
             setLoading(true);
@@ -132,13 +119,22 @@ const PlanTable = () => {
                         </p>
                     </div>
 
-                    <Button
-                        type="button"
-                        onClick={openCreate}
-                        className="bg-blue-600 hover:bg-blue-700"
-                    >
-                        <Plus className="w-4 h-4 mr-2" /> Create Plan
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        <Link href="/admin/entitlements">
+                            <Button className="bg-purple-600 hover:bg-purple-700">
+                                <Crown className="w-4 h-4 mr-2" />
+                                Manage Entitlements
+                            </Button>
+                        </Link>
+                        
+                        <Button
+                            type="button"
+                            onClick={openCreate}
+                            className="bg-blue-600 hover:bg-blue-700"
+                        >
+                            <Plus className="w-4 h-4 mr-2" /> Create Plan
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -166,28 +162,6 @@ const PlanTable = () => {
                                     <TableCell className="text-gray-500 font-mono text-xs">{String(plan.id)}</TableCell>
                                     <TableCell className="text-right pr-6">
                                         <div className="flex items-center justify-end gap-2">
-                                            {/* View Entitlements */}
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="text-gray-300 hover:text-white hover:bg-gray-800"
-                                                onClick={() => openViewEntitlements(plan.id)}
-                                                title="View entitlements"
-                                            >
-                                                <Eye className="w-4 h-4" />
-                                            </Button>
-
-                                            {/* Add Entitlements */}
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="text-gray-300 hover:text-white hover:bg-gray-800"
-                                                onClick={() => openAddEntitlements(plan.id)}
-                                                title="Add entitlements"
-                                            >
-                                                <PlusCircle className="w-4 h-4" />
-                                            </Button>
-
                                             {/* Edit Plan */}
                                             <Button
                                                 variant="ghost"
@@ -232,24 +206,6 @@ const PlanTable = () => {
                 mode={modalMode}
                 initialData={editingPlan ?? undefined}
                 onSaved={handleSaved}
-            />
-
-            {/* Modal View Entitlements */}
-            <EntitlementsViewModal
-                open={viewEntOpen}
-                onOpenChange={setViewEntOpen}
-                planId={selectedPlanId}
-            />
-
-            {/* Modal Add Entitlements */}
-            <EntitlementsFormModal
-                open={addEntOpen}
-                onOpenChange={setAddEntOpen}
-                planId={selectedPlanId ?? 0}
-                onCreated={() => {
-                    // opsional: reload detail/refresh list
-                    // di sini list plan tidak menampilkan entitlements, jadi cukup tutup modal
-                }}
             />
         </>
     );
