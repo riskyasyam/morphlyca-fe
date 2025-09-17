@@ -13,7 +13,7 @@ export default function AdminSidebar() {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const router = useRouter();
   const menuItems = [
-    { icon: Home, label: "Dashoard", href: "/admin/dashboard" },
+    { icon: Home, label: "Dashboard", href: "/admin/dashboard" },
     { icon: User, label: "User", href: "/admin/user" },
     { icon: Notebook, label: "Plan", href: "/admin/plan" },
     { icon: Cpu, label: "Feature", href: "/admin/feature" },
@@ -50,7 +50,7 @@ export default function AdminSidebar() {
         <div>
           {menuItems
             .filter((item) =>
-              ["Dashoard"].includes(item.label)
+              ["Dashboard"].includes(item.label)
             )
             .map((item, index) => (
               <Link key={index} href={item.href}>

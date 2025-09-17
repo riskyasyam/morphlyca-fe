@@ -10,6 +10,14 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const handlePrimeLogin = () => {
+    // Ganti URL callback agar diarahkan ke /admin/dashboard setelah login
+    const params = new URLSearchParams({
+      redirect_uri: `${window.location.origin}/admin/dashboard`
+    });
+    window.location.href = `http://localhost:3000/auth/prime/login?${params.toString()}`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -45,6 +53,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4">
+      
       {/* Subtle light effects */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl"></div>
@@ -86,6 +95,14 @@ export default function LoginPage() {
             disabled={loading}
           >
             {loading ? "Loading..." : "Login"}
+          </button>
+          <button
+            type="button"
+            onClick={handlePrimeLogin}
+            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Login dengan PrimeAuth"}
           </button>
         </div>
         </form>

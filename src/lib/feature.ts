@@ -68,3 +68,35 @@ export const updateFeature = async (
 export const deleteFeature = async (id: string | number): Promise<void> => {
   await api.delete(`/features/${id}`);
 };
+
+// Get model categories
+export async function getModelCategories(): Promise<string[]> {
+  const response = await api.get("/features/model-categories", {
+    method: "GET",
+  });
+  return response.data;
+}
+
+// Get models by category
+export async function getModelsByCategory(category: string): Promise<Feature[]> {
+  const response = await api.get(`/features/processor-options/category/${category}`, {
+    method: "GET",
+  });
+  return response.data;
+}
+
+// Get core processors
+export async function getCoreProcessors(): Promise<Feature[]> {
+  const response = await api.get("/features/core-processors", {
+    method: "GET",
+  });
+  return response.data;
+}
+
+// Get all processor options
+export async function getAllProcessorOptions(): Promise<Feature[]> {
+  const response = await api.get("/features/processor-options", {
+    method: "GET",
+  });
+  return response.data;
+}

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,9 +30,9 @@ export default function Navbar() {
         </ul>
 
         {/* Desktop CTA Button */}
-        <button className="hidden lg:block px-4 xl:px-6 py-4 text-xs xl:text-[13px] font-medium text-dark bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary rounded-lg hover:opacity-90 transition-opacity duration-200 shadow-[-20px_4px_40px_0px_#DBFFAA40]">
+        <Link href="/login" className="hidden lg:block px-4 xl:px-6 py-4 text-xs xl:text-[13px] font-medium text-dark bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary rounded-lg hover:opacity-90 transition-opacity duration-200 shadow-[-20px_4px_40px_0px_#DBFFAA40]">
           Get Started
-        </button>
+        </Link>
 
         {/* Mobile Menu Button */}
         <button 
