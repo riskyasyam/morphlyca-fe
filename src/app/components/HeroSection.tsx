@@ -5,7 +5,7 @@ export default function HeroSection() {
   return (
     <>
       <Navbar />
-      <section className="min-h-screen flex flex-col items-center bg-gray-900 text-white px-4 md:px-6 lg:px-8 relative overflow-hidden">
+      <section className="h-[550px] md:h-full flex flex-col items-center bg-gray-900 text-white px-4 md:px-6 lg:px-8 relative overflow-hidden">
         {/* Background Video */}
         <div className="absolute top-0 right-0 z-0 w-full h-full">
           <video 
