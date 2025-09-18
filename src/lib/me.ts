@@ -3,8 +3,14 @@ import { api } from "./api";
 
 // Mengambil data user dari endpoint baru
 export const fetchMe = async (): Promise<User> => {
-  const res = await api.get("/user/me");
-  return res.data;
+  try {
+    const res = await api.get("/user/me");
+    return res.data;
+  } catch (error: any) {
+    console.error('Failed to fetch user profile:', error);
+    // If 401, the interceptor will handle redirect to login
+    throw new Error(error.response?.data?.message || 'Failed to fetch user profile');
+  }
 };
 
 // Mengambil data subscription user

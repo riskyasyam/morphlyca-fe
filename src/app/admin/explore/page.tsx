@@ -99,9 +99,11 @@ export default function ExplorePage() {
   const [sourceFile, setSourceFile] = useState<File | null>(null);
   const [targetFile, setTargetFile] = useState<File | null>(null);
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [quotaToday, setQuotaToday] = useState<QuotaToday | null>(null);
+  const [entitlements, setEntitlements] = useState<any>(null);
 
-  // processors data dari API
-  const [features, setFeatures] = useState<Feature[]>([]);
+  // proces ors data dari API
+  const [features, setFeatures]    = useState<Feature[]>([]);
   const [loadingFeatures, setLoadingFeatures] = useState(true);
 
   // Model options loaded from API by category - initialize first
@@ -110,7 +112,7 @@ export default function ExplorePage() {
 
   // pisahkan processors dan features - hanya yang ACTIVE
   const processors = useMemo(() => {
-    return features.filter(f => f.type === "processor" && f.status === "ACTIVE");
+    return features.filter(f => f.type === "proces  sor" && f.status === "ACTIVE");
   }, [features]);
 
   // processors selection
@@ -726,7 +728,7 @@ export default function ExplorePage() {
           {/* Quota info */}
           <div className="flex items-center gap-4">
             <div className="text-sm text-slate-400">
-              Quota: <span className="text-white">{fmt(quota?.remaining ?? 0)}</span> / {fmt(quota?.dailyLimit ?? 0)}
+              Quota: <span className="text-white">{fmt(quota?.remaining ?? 0)}</span> / {fmt(entitlements?.daily_weight_quota ?? 0)}
             </div>
             <Button
               onClick={handleSubmit}
