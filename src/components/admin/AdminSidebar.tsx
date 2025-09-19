@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-// import { handleLogout } from "@/lib/auth";
+import { handleLogout as authLogout } from "@/lib/auth";
 import SearchModal from "./SearchModal";
 import Image from "next/image";
 
@@ -24,11 +24,16 @@ export default function AdminSidebar() {
   ];
 
   const handleLogout = async () => {
+    const isConfirmed = window.confirm("Are you sure you want to logout?");
+    if (!isConfirmed) return;
+    
     try {
-      // await handleLogout(); 
+      await authLogout(); // This will clear tokens and cookies
       router.push("/");
     } catch (error) {
       console.error("Logout failed:", error);
+      // Even if logout fails, redirect to login page
+      router.push("/");
     }
   };
 
