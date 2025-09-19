@@ -35,20 +35,22 @@ const PROCESSOR_OPTIONS: Record<string, string[]> = {
 // Enhanced model options based on backend docs (fallback static data)
 const MODEL_OPTIONS = {
   face_swapper_model: [
-    { value: "inswapper_128", label: "inswapper_128" },
-    { value: "hyperswap_1a_256", label: "hyperswap_1a_256" },
-    { value: "blendswap_256", label: "blendswap_256" },
-    { value: "simswap_256", label: "simswap_256" },
-    { value: "simswap_512", label: "simswap_512" },
-    { value: "uniface_256", label: "uniface_256" }
+    { value: "inswapper_128_fp16", label: "InSwapper 128 FP16" },
+    { value: "blendswap_256", label: "BlendSwap 256" },
+    { value: "inswapper_128", label: "InSwapper 128" },
+    { value: "simswap_256", label: "SimSwap 256" },
+    { value: "simswap_512", label: "SimSwap 512" },
+    { value: "uniface_256", label: "UniFace 256" }
   ],
   face_enhancer_model: [
     { value: "gfpgan_1.4", label: "GFPGAN 1.4" },
-    { value: "gfpgan_1.3", label: "GFPGAN 1.3" },
-    { value: "gfpgan_1.2", label: "GFPGAN 1.2" },
     { value: "codeformer", label: "CodeFormer" },
+    { value: "gfpgan_1.2", label: "GFPGAN 1.2" },
+    { value: "gfpgan_1.3", label: "GFPGAN 1.3" },
     { value: "gpen_bfr_256", label: "GPEN BFR 256" },
     { value: "gpen_bfr_512", label: "GPEN BFR 512" },
+    { value: "gpen_bfr_1024", label: "GPEN BFR 1024" },
+    { value: "gpen_bfr_2048", label: "GPEN BFR 2048" },
     { value: "restoreformer_plus_plus", label: "RestoreFormer++" }
   ],
   frame_enhancer_model: [
@@ -112,7 +114,14 @@ export default function ExplorePage() {
 
   // pisahkan processors dan features - hanya yang ACTIVE
   const processors = useMemo(() => {
-    return features.filter(f => f.type === "proces  sor" && f.status === "ACTIVE");
+    const result = features.filter(f => f.type === "processor" && f.status === "ACTIVE");
+    console.log("🔍 All features:", features);
+    console.log("🎯 Filtered processors:", result);
+    console.log("📊 Features by type:", features.reduce((acc, f) => {
+      acc[f.type] = (acc[f.type] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>));
+    return result;
   }, [features]);
 
   // processors selection
@@ -1276,7 +1285,6 @@ export default function ExplorePage() {
                     faceSelectorMode: e.target.value 
                   }))}
                 >
-                  <option value="automatic">Automatic</option>
                   <option value="reference">Reference</option>
                   <option value="one">One</option>
                   <option value="many">Many</option>

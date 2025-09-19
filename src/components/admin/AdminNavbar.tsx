@@ -10,11 +10,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { handleLogout as authLogout } from "@/lib/auth";
+
+
 
 
 export default function AdminNavbar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const isConfirmed = window.confirm("Are you sure you want to logout?");
+    if (!isConfirmed) return;
+    
+    try {
+      await authLogout(); // This will clear tokens and cookies
+      router.push("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Even if logout fails, redirect to login page
+      router.push("/");
+    }
+  };
 
   // Mapping pathname ke judul
   const pageTitles: Record<string, string> = {
@@ -69,7 +87,9 @@ export default function AdminNavbar() {
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-gray-700" />
-              <DropdownMenuItem className="text-red-400 hover:bg-gray-800 hover:text-red-300">
+              <DropdownMenuItem 
+                onClick={handleLogout}
+                className="text-red-400 hover:bg-gray-800 hover:text-red-300">
                 Log out
               </DropdownMenuItem>
             </DropdownMenuContent>
