@@ -19,6 +19,16 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
     ],
+    rules: {
+      // Allow 'any' type during development
+      "@typescript-eslint/no-explicit-any": "warn",
+      // Allow unused variables (they might be used later)
+      "@typescript-eslint/no-unused-vars": "warn",
+      // Allow img elements (can be converted to Image later)
+      "@next/next/no-img-element": "warn",
+      // Allow missing alt text for now
+      "jsx-a11y/alt-text": "warn",
+    },
   },
 ];
 

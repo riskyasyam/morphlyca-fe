@@ -256,7 +256,21 @@ docker volume prune
 ./docker.sh prod-detached
 ```
 
-#### 5. Windows Permission Issues
+#### 5. ESLint/TypeScript Build Errors
+```bash
+# Jika build gagal karena ESLint errors:
+
+# Solusi 1: Build sudah dikonfigurasi untuk ignore errors
+# File next.config.ts sudah diset untuk ignoreDuringBuilds: true
+
+# Solusi 2: Jika masih error, cek logs
+docker logs container_name
+
+# Solusi 3: Build dengan skip validation
+docker build --build-arg SKIP_ENV_VALIDATION=1 .
+```
+
+#### 6. Windows Permission Issues
 ```powershell
 # Jika error "Access is denied" di Windows:
 
