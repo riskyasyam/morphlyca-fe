@@ -87,6 +87,20 @@ const DIRECTION_OPTIONS = [
   { value: "decrease", label: "Decrease Age" }
 ];
 
+// Fixed dropdown options - removed invalid choices
+const faceSelectorModeOptions = [
+  { value: 'one', label: 'One Face (Recommended)' },      // Valid + guidance
+  { value: 'many', label: 'Many Faces' },                 // Valid
+  { value: 'reference', label: 'Reference Face' }         // Valid
+  // Removed 'automatic' - invalid option
+];
+
+const genderOptions = [
+  { value: 'male', label: 'Male' },                       // Valid
+  { value: 'female', label: 'Female' }                    // Valid
+  // Removed 'any' - invalid option
+];
+
 const gradientButtonStyle: React.CSSProperties = {
   background: "linear-gradient(90deg, #A0D45B 0%, #DDFFB1 34.55%, #7EBE2A 100%)",
   color: "#0B1400",
@@ -188,12 +202,47 @@ export default function ExplorePage() {
   // feature selection values
   const [featureValues, setFeatureValues] = useState<Record<string, any>>({});
 
-  // Global options state
+  // Validation state
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+
+  // Global options state - Fixed to valid values
   const [globalOptions, setGlobalOptions] = useState<Record<string, any>>({
+    // Hardware settings
+    useCuda: true,
+    deviceId: '0',
+    
+    // Global settings - Fixed to valid values
+    faceSelectorMode: 'one',              // Valid choice (was: 'automatic')
+    faceSelectorGender: 'male',           // Valid choice (was: 'any')
+    referenceFaceDistance: 0.6,           // Standard value
+    faceSelectorOrder: 'left-right',
+    faceSelectorAgeStart: 0,
+    faceSelectorAgeEnd: 100,
+    
+    // Face detection
+    faceDetectorModel: 'retinaface',
+    faceDetectorScore: 0.5,
+    
+    // Face masking
+    faceMaskTypes: 'box',
+    faceMaskBlur: 0.3,
+    faceMaskPadding: '0,0,0,0',
+    
+    // Processor-specific defaults
+    faceEnhancerBlend: 80,
+    frameEnhancerBlend: 80,
+    ageModifierDirection: 0,
+    expressionRestorerFactor: 80,
+    faceEditorBlend: 80,
+    frameColorizerBlend: 80,
+    lipSyncerWeight: 1.0,
+    deepSwapperMorph: 80,
+    
+    // Output settings
+    outputVideoEncoder: 'libx264',
     outputVideoQuality: 90,
-    faceSelectorMode: "automatic",
-    faceSelectorGender: "any",
-    useCuda: true
+    outputVideoPreset: 'medium',
+    outputVideoFps: 25
   });
 
   // quota & kalkulasi weight
@@ -203,6 +252,45 @@ export default function ExplorePage() {
       .filter(p => selected[p.name])
       .reduce((sum, p) => sum + (p.weight || 0), 0);
   }, [selected, processors]);
+
+  // Auto-select required models when processors change
+  useEffect(() => {
+    const requiredModels = {
+      face_swapper: 'inswapper_128_fp16',
+      face_enhancer: 'gfpgan_1.4',
+      frame_enhancer: 'real_esrgan_x4plus', 
+      frame_colorizer: 'ddcolor',
+      lip_syncer: 'wav2lip_gan',
+      deep_swapper: 'inswapper_128',
+      expression_restorer: 'live_portrait',
+      face_editor: 'live_portrait'
+    };
+
+    setFeatureValues(prevValues => {
+      const updatedValues = { ...prevValues };
+      let hasUpdates = false;
+      
+      Object.keys(selected).forEach(processor => {
+        if (selected[processor]) {
+          const modelField = `${processor}_model`;
+          const requiredModel = requiredModels[processor as keyof typeof requiredModels];
+          
+          if (requiredModel && !updatedValues[modelField]) {
+            updatedValues[modelField] = requiredModel;
+            hasUpdates = true;
+            console.log(`🎯 Auto-selected ${requiredModel} for ${processor}`);
+          }
+        }
+      });
+      
+      if (hasUpdates) {
+        // Show notification to user about auto-selection
+        console.log('✅ Required models auto-selected for enhanced processing');
+      }
+      
+      return updatedValues;
+    });
+  }, [selected]);
 
   // preview states
   const [sourcePreview, setSourcePreview] = useState<string>("");
@@ -458,43 +546,73 @@ export default function ExplorePage() {
     };
   }, [sourcePreview, targetPreview, audioPreview]);
 
+  // Enhanced validation function
+  const validateForm = () => {
+    const errors: string[] = [];
+    
+    // Basic file validation
+    if (!sourceFile) errors.push('Source file is required');
+    if (!targetFile) errors.push('Target file is required');
+    
+    // Processor validation
+    const selectedProcessors = Object.keys(selected).filter(key => selected[key]);
+    if (selectedProcessors.length === 0) {
+      errors.push('At least one processor must be selected');
+    }
+    
+    // Required model validation
+    const requiredModels = {
+      face_enhancer: 'faceEnhancerModel',
+      frame_enhancer: 'frameEnhancerModel',
+      frame_colorizer: 'frameColorizerModel', 
+      lip_syncer: 'lipSyncerModel',
+      deep_swapper: 'deepSwapperModel',
+      expression_restorer: 'expressionRestorerModel',
+      face_editor: 'faceEditorModel'
+    };
+    
+    selectedProcessors.forEach(processor => {
+      const modelField = `${processor}_model`;
+      if (!featureValues[modelField]) {
+        errors.push(`${processor.replace('_', ' ')} requires a model selection`);
+      }
+    });
+    
+    // Global option validation
+    const validFaceSelectorModes = ['many', 'one', 'reference'];
+    if (!validFaceSelectorModes.includes(globalOptions.faceSelectorMode)) {
+      errors.push('Invalid face selector mode');
+    }
+    
+    const validGenders = ['male', 'female'];
+    if (!validGenders.includes(globalOptions.faceSelectorGender)) {
+      errors.push('Invalid face selector gender');
+    }
+    
+    // Quota validation
+    if (totalSelectedWeight > (quota?.remaining ?? 0)) {
+      errors.push(`Insufficient quota. Required: ${totalSelectedWeight}, Available: ${quota?.remaining ?? 0}`);
+    }
+    
+    // Set validation errors
+    setValidationErrors(errors);
+    
+    if (errors.length > 0) {
+      console.error('❌ Validation failed:', errors);
+      return false;
+    }
+    
+    console.log('✅ Validation passed');
+    return true;
+  };
+
   // kirim job
   const canSubmit = !!sourceFile && !!targetFile && totalSelectedWeight > 0 && !submitting && totalSelectedWeight <= (quota?.remaining ?? 0);
 
   const handleSubmit = async () => {
-    if (!sourceFile || !targetFile) return;
-
-    // Check quota before submission
-    if (totalSelectedWeight > (quota?.remaining ?? 0)) {
-      alert(`Insufficient quota. You need ${totalSelectedWeight} but only have ${quota?.remaining ?? 0} remaining.`);
-      return;
-    }
-
-    // Validate required models for selected processors
-    const validationErrors: string[] = [];
-    const selectedProcessors = Object.keys(selected).filter(key => selected[key]);
-    
-    selectedProcessors.forEach(processor => {
-      // Check if processor requires a model
-      const modelField = `${processor}_model`;
-      if (PROCESSOR_OPTIONS[processor]?.includes(modelField)) {
-        // Check if it's a required model processor
-        if (['face_enhancer', 'frame_enhancer', 'expression_restorer', 'face_editor', 'frame_colorizer', 'lip_syncer', 'deep_swapper'].includes(processor)) {
-          const hasModelValue = featureValues[modelField] || globalOptions[modelField];
-          const categoryModels = modelOptions[modelField] || [];
-          const fallbackModels = MODEL_OPTIONS[modelField as keyof typeof MODEL_OPTIONS] || [];
-          const availableModels = categoryModels.length > 0 ? categoryModels : fallbackModels;
-          
-          if (!hasModelValue && availableModels.length > 0) {
-            validationErrors.push(`${processor.replace('_', ' ')} requires a model selection`);
-          }
-        }
-      }
-    });
-
-    if (validationErrors.length > 0) {
-      alert('Please fix the following issues:\n' + validationErrors.join('\n'));
-      return;
+    // Enhanced validation with blocking
+    if (!validateForm()) {
+      return; // Block submission if validation fails
     }
 
     setSubmitting(true);
@@ -502,6 +620,9 @@ export default function ExplorePage() {
     setJob(null);
 
     try {
+      // Get selected processors
+      const selectedProcessors = Object.keys(selected).filter(key => selected[key]);
+      
       // Prepare options with proper field names for backend
       const processedOptions: Record<string, any> = {};
       
@@ -552,10 +673,10 @@ export default function ExplorePage() {
       console.log("- Processors:", selectedProcessors);
       console.log("- Options:", processedOptions);
 
-      // Create FormData for file upload
+      // Create FormData for file upload - ensure files are not null
       const form = new FormData();
-      form.append("source", sourceFile);
-      form.append("target", targetFile);
+      if (sourceFile) form.append("source", sourceFile);
+      if (targetFile) form.append("target", targetFile);
       if (audioFile) form.append("audio", audioFile);
       
       // Backend expects processors as JSON string and options as JSON string
@@ -651,6 +772,76 @@ export default function ExplorePage() {
     if (file.type.startsWith('video/')) return 'video';
     return 'unknown';
   };
+
+  // Validation UI Components
+  const ValidationErrors = () => {
+    if (validationErrors.length === 0) return null;
+    
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+        <div className="flex">
+          <div className="flex-shrink-0">
+            <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-red-800">Validation Errors</h3>
+            <div className="mt-2 text-sm text-red-700">
+              <ul className="list-disc list-inside space-y-1">
+                {validationErrors.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const ModelStatusIndicator = ({ processor, modelField, isRequired = true }: { processor: string, modelField: string, isRequired?: boolean }) => {
+    const hasModel = featureValues[modelField];
+    const isSelected = selected[processor];
+    
+    if (!isSelected) return null;
+    
+    return (
+      <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+        hasModel 
+          ? 'bg-green-100 text-green-800' 
+          : 'bg-red-100 text-red-800'
+      }`}>
+        {hasModel ? (
+          <>
+            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+            Model Selected
+          </>
+        ) : (
+          <>
+            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+            {isRequired ? 'Model Required' : 'No Model'}
+          </>
+        )}
+      </div>
+    );
+  };
+
+  const ProcessorGuide = () => (
+    <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+      <h4 className="text-sm font-medium text-blue-800 mb-2">Processor Combinations:</h4>
+      <div className="text-sm text-blue-700 space-y-1">
+        <div>• <strong>Basic Swap:</strong> face_swapper only</div>
+        <div>• <strong>Enhanced Quality:</strong> face_swapper + face_enhancer</div>
+        <div>• <strong>Professional:</strong> Add frame_enhancer for upscaled video</div>
+        <div>• <strong>Creative:</strong> Add frame_colorizer for artistic effects</div>
+      </div>
+    </div>
+  );
 
   // Render model selector for processor-specific models using category-based options
   const renderModelSelector = (processorName: string, feature: Feature) => {
@@ -908,6 +1099,13 @@ export default function ExplorePage() {
           {/* Processors */}
           <div className="p-4 border-b border-gray-800">
             <h3 className="text-sm font-medium text-slate-300 mb-3">PROCESSORS</h3>
+            
+            {/* Validation Errors */}
+            <ValidationErrors />
+            
+            {/* Processor Guide */}
+            <ProcessorGuide />
+            
             {loadingFeatures ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -941,11 +1139,20 @@ export default function ExplorePage() {
                         }))}
                       />
                       <div className="flex-1">
-                        <div className="font-medium">{processor.name}</div>
-                        <div className="text-xs text-slate-400">Weight: {processor.weight || 0}</div>
-                        {processor.description && (
-                          <div className="text-xs text-slate-500 mt-1">{processor.description}</div>
-                        )}
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium">{processor.name}</div>
+                            <div className="text-xs text-slate-400">Weight: {processor.weight || 0}</div>
+                            {processor.description && (
+                              <div className="text-xs text-slate-500 mt-1">{processor.description}</div>
+                            )}
+                          </div>
+                          <ModelStatusIndicator 
+                            processor={processor.name} 
+                            modelField={`${processor.name}_model`}
+                            isRequired={['face_enhancer', 'frame_enhancer', 'expression_restorer', 'face_editor', 'frame_colorizer', 'lip_syncer', 'deep_swapper'].includes(processor.name)}
+                          />
+                        </div>
                       </div>
                     </label>
                   );
@@ -1285,11 +1492,11 @@ export default function ExplorePage() {
                     faceSelectorMode: e.target.value 
                   }))}
                 >
-                  <option value="reference">Reference</option>
-                  <option value="one">One</option>
-                  <option value="many">Many</option>
-                  <option value="best-worst">Best-Worst</option>
-                  <option value="left-right">Left-Right</option>
+                  {faceSelectorModeOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -1306,9 +1513,11 @@ export default function ExplorePage() {
                     faceSelectorGender: e.target.value 
                   }))}
                 >
-                  <option value="any">Any</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
+                  {genderOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
