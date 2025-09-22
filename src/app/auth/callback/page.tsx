@@ -1,8 +1,9 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function AuthCallback() {
+// Component untuk handle search params
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -23,5 +24,23 @@ export default function AuthCallback() {
     <div className="flex items-center justify-center min-h-screen">
       <span className="text-lg">Mengarahkan ke dashboard...</span>
     </div>
+  );
+}
+
+// Loading component
+function AuthCallbackLoading() {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <span className="text-lg">Loading...</span>
+    </div>
+  );
+}
+
+// Main component dengan Suspense
+export default function AuthCallback() {
+  return (
+    <Suspense fallback={<AuthCallbackLoading />}>
+      <AuthCallbackContent />
+    </Suspense>
   );
 }

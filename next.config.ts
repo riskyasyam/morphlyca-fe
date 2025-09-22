@@ -9,9 +9,9 @@ const nextConfig: NextConfig = {
     // Disable TypeScript type checking during production builds
     ignoreBuildErrors: true,
   },
-  experimental: {
+  // Fix turbopack configuration
+  turbopack: {
     // Enable turbopack for faster builds
-    turbo: {},
   },
   // Optimize for Docker
   output: 'standalone',

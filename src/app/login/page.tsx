@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { login, debugLogin, testBackendConnection } from "@/lib/auth";
 import { ArrowLeft, Bug, Wifi } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
-export default function LoginPage() {
+// Component untuk handle search params
+function LoginContent() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -218,5 +219,23 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+// Loading component
+function LoginLoading() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <span className="text-lg">Loading...</span>
+    </div>
+  );
+}
+
+// Main component dengan Suspense
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginLoading />}>
+      <LoginContent />
+    </Suspense>
   );
 }
