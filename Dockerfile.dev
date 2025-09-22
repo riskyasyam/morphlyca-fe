@@ -1,0 +1,32 @@
+# Dockerfile.dev untuk Development
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+
+RUN \
+  if [ -f yarn.lock ]; then yarn install; \
+  elif [ -f package-lock.json ]; then npm install; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm install; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
+
+# Copy source code
+COPY . .
+
+# Expose port
+EXPOSE 3001
+
+# Environment for development
+ENV NODE_ENV development
+ENV NEXT_TELEMETRY_DISABLED 1
+
+# Start development server
+CMD \
+  if [ -f yarn.lock ]; then yarn dev; \
+  elif [ -f package-lock.json ]; then npm run dev; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm dev; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
