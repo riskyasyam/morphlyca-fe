@@ -5,25 +5,26 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:                             # ← penting: inject ke build
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        NEXT_PUBLIC_FRONTEND_URL: ${NEXT_PUBLIC_FRONTEND_URL}
+        NEXT_PUBLIC_PRIMEAUTH_AUTH_SERVICE_URL: ${NEXT_PUBLIC_PRIMEAUTH_AUTH_SERVICE_URL}
+        NEXT_PUBLIC_PRIMEAUTH_REALM_ID: ${NEXT_PUBLIC_PRIMEAUTH_REALM_ID}
+        NEXT_PUBLIC_PRIMEAUTH_CLIENT_ID: ${NEXT_PUBLIC_PRIMEAUTH_CLIENT_ID}
+        NEXT_PUBLIC_PRIMEAUTH_REDIRECT_URI: ${NEXT_PUBLIC_PRIMEAUTH_REDIRECT_URI}
+        NEXT_PUBLIC_PRIMEAUTH_TOKEN_URL: ${NEXT_PUBLIC_PRIMEAUTH_TOKEN_URL}
+        NEXT_PUBLIC_MINIO_PUBLIC_BASE: ${NEXT_PUBLIC_MINIO_PUBLIC_BASE}
+        NEXT_PUBLIC_MINIO_ALLOWED_PREFIX: ${NEXT_PUBLIC_MINIO_ALLOWED_PREFIX}
     container_name: morphlyca-frontend
+    env_file:
+      - .env.production
     ports:
       - "3001:3000"
-    environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://192.168.210.14:4000
-      - NEXT_PUBLIC_FRONTEND_URL=http://192.168.210.14:3001
-      - NEXT_PUBLIC_PRIMEAUTH_AUTH_SERVICE_URL=https://api.primeauth.meetaza.com/auth
-      - NEXT_PUBLIC_PRIMEAUTH_REALM_ID=8930ef74-b6cf-465a-9a74-8f9cc591c3e3
-      - NEXT_PUBLIC_PRIMEAUTH_CLIENT_ID=primeauth-admin
-      - NEXT_PUBLIC_PRIMEAUTH_REDIRECT_URI=http://192.168.210.14:3001/auth/callback
-      - NEXT_PUBLIC_PRIMEAUTH_TOKEN_URL=https://api.primeauth.meetaza.com/auth/realms/8930ef74-b6cf-465a-9a74-8f9cc591c3e3/protocol/openid-connect/token
-      - NEXT_PUBLIC_MINIO_PUBLIC_BASE=http://192.168.210.14:9000
-      - NEXT_PUBLIC_MINIO_ALLOWED_PREFIX=facefusion-output/
     networks:
       - morphlyca-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      test: ["CMD", "wget", "-f", "http://localhost:3000/"]
       interval: 30s
       timeout: 10s
       retries: 3
