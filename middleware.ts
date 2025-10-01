@@ -2,33 +2,65 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  // Skip middleware for API routes and static files
+  if (
+    request.nextUrl.pathname.startsWith('/api/') ||
+    request.nextUrl.pathname.startsWith('/_next/') ||
+    request.nextUrl.pathname.startsWith('/favicon.ico') ||
+    request.nextUrl.pathname.startsWith('/images/') ||
+    request.nextUrl.pathname.startsWith('/public/')
+  ) {
+    return NextResponse.next();
+  }
+
   // Check if the request is for admin routes
   if (request.nextUrl.pathname.startsWith('/admin')) {
-    // Check for authentication token in cookies
-    const token = request.cookies.get('token')?.value;
+    // Check for authentication token in cookies with multiple possible names
+    const token = request.cookies.get('token')?.value || 
+                  request.cookies.get('access_token')?.value ||
+                  request.cookies.get('id_token')?.value;
+    
+    // Debug logging (remove in production)
+    console.log('Middleware check:', {
+      path: request.nextUrl.pathname,
+      hasToken: !!token,
+      tokenPreview: token ? token.substring(0, 20) + '...' : 'none',
+      cookies: Object.fromEntries(request.cookies.getAll().map(c => [c.name, c.value.substring(0, 10) + '...']))
+    });
     
     // If no token, redirect to login
     if (!token) {
+      console.log('No token found, redirecting to login');
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
       return NextResponse.redirect(loginUrl);
     }
     
-    // For admin routes, check if user has admin role
-    // You can decode the token here or make an API call to verify admin permissions
-    // For now, we'll do a simple check (you should implement proper JWT verification)
+    // Basic token validation
     try {
-      // Simple token validation - in production, use proper JWT verification
-      if (token.length < 10) {
-        throw new Error('Invalid token');
+      // Check if token looks like a JWT (has 3 parts separated by dots)
+      const tokenParts = token.split('.');
+      if (tokenParts.length !== 3) {
+        throw new Error('Invalid token format');
       }
       
-      // You can add more sophisticated role checking here
-      // For example, decode JWT and check user role
+      // Try to decode the payload (without verification for basic check)
+      const payload = JSON.parse(atob(tokenParts[1]));
+      
+      // Check if token is expired
+      if (payload.exp && payload.exp < Date.now() / 1000) {
+        console.log('Token expired, redirecting to login');
+        throw new Error('Token expired');
+      }
+      
+      console.log('Token valid, allowing access to:', request.nextUrl.pathname);
       
       // Allow the request to continue
       return NextResponse.next();
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.log('Token validation failed:', errorMessage);
+      
       // If token is invalid, redirect to login
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirect', request.nextUrl.pathname);
@@ -41,7 +73,7 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Match all admin routes
+  // Match all admin routes but exclude API routes and static files
   matcher: [
     '/admin/:path*',
   ],

@@ -49,15 +49,21 @@ export async function login(credentials: LoginRequest): Promise<LoginResponse> {
     console.log('Login response status:', response.status);
     console.log('Login response data:', response.data);
     
-    // Manual login API returns different structure
+    // Manual login API returns: { message, user, isAuthenticated }
     if (response.data.isAuthenticated && response.data.user) {
       // Store user data
       localStorage.setItem('user', JSON.stringify(response.data.user));
       
-      // Cookies are automatically set by the backend (HTTP-only)
+      // Backend sets HTTP-only cookies automatically
+      // Try to also get access_token from response if provided
+      if (response.data.tokens?.access_token) {
+        localStorage.setItem('access_token', response.data.tokens.access_token);
+      }
+      
       return {
         success: true,
         user: response.data.user,
+        token: response.data.tokens?.access_token,
         message: response.data.message || 'Login successful'
       };
     } else {

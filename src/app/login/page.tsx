@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { login, debugLogin, testBackendConnection } from "@/lib/auth";
 import { ArrowLeft, Bug, Wifi } from "lucide-react";
@@ -18,13 +18,26 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // Handle error from URL params (from auth callback failures)
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      setError(decodeURIComponent(errorParam));
+    }
+  }, [searchParams]);
+
   const handlePrimeLogin = () => {
+    // Clear any existing errors
+    setError("");
+    
     // Menggunakan environment variable untuk consistency
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
     const redirectPath = searchParams.get('redirect') || '/admin/dashboard';
     const params = new URLSearchParams({
       redirect_uri: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectPath)}`
     });
+    
+    console.log('Redirecting to PrimeAuth:', `${baseUrl}/auth/prime/login?${params.toString()}`);
     window.location.href = `${baseUrl}/auth/prime/login?${params.toString()}`;
   };
 

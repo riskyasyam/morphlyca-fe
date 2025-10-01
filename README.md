@@ -270,7 +270,32 @@ docker logs container_name
 docker build --build-arg SKIP_ENV_VALIDATION=1 .
 ```
 
-#### 6. Windows Permission Issues
+#### 6. Authentication Issues
+```bash
+# Debug authentication problems:
+
+# 1. Check if backend API is accessible
+curl http://YOUR_VM_IP:3000/auth/debug-config
+
+# 2. Test manual login endpoint
+curl -X POST http://YOUR_VM_IP:3000/auth/prime/manual-login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"test@example.com","password":"testpass"}'
+
+# 3. Check PrimeAuth configuration
+curl http://YOUR_VM_IP:3000/auth/test-primeauth
+
+# 4. Check browser console for errors during auth flow
+# Open DevTools → Console when testing login
+
+# 5. Common fixes:
+# - Update NEXT_PUBLIC_API_URL to correct backend URL
+# - Ensure backend CORS allows frontend domain
+# - Check cookie domain settings match
+# - Verify PrimeAuth realm and client configuration
+```
+
+#### 7. Windows Permission Issues
 ```powershell
 # Jika error "Access is denied" di Windows:
 
