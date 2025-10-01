@@ -119,16 +119,21 @@ function DashboardContent() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-6">
+      <div className="relative z-[60] pointer-events-auto text-white p-6 space-y-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-8 bg-gray-800 rounded w-1/4 mb-2"></div>
+          <div className="h-4 bg-gray-800 rounded w-1/3"></div>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="animate-pulse">
-              <div className="h-24 bg-gray-200 rounded"></div>
-            </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-32 bg-gray-900 border border-gray-800 rounded-lg animate-pulse"
+              style={{
+                animationDelay: `${i * 0.1}s`,
+                animationDuration: '1.5s'
+              }}
+            />
           ))}
         </div>
       </div>
@@ -136,413 +141,391 @@ function DashboardContent() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="relative z-[60] pointer-events-auto text-white p-6 space-y-6">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Welcome, {me?.displayName ?? "User"}</h1>
-          <p className="text-muted-foreground">
+          <h2 className="text-3xl font-bold mb-1">Welcome, {me?.displayName ?? "User"}</h2>
+          <p className="text-slate-400">
             {me?.email} • Role: <span className="uppercase">{me?.role}</span>
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Badge variant="secondary">Admin</Badge>
+          <div className="inline-block px-2 py-1 rounded text-xs bg-gray-800 text-slate-300">
+            Admin
+          </div>
           <Button
             onClick={handleRefresh}
-            variant="outline"
+            className="bg-gray-800 hover:bg-gray-700 border border-gray-700"
             disabled={refreshing}
           >
             {refreshing ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                Refreshing...
-              </>
+              <span className="inline-flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" /> Refreshing…
+              </span>
             ) : (
-              <>
-                <RefreshCcw className="w-4 h-4 mr-2" />
-                Refresh
-              </>
+              <span className="inline-flex items-center gap-2">
+                <RefreshCcw className="w-4 h-4" /> Refresh
+              </span>
             )}
           </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Current Plan</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {subscription?.planName ? subscription.planName : "Free Plan"}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {subscription?.planCode && `Code: ${subscription.planCode}`}
-            </p>
-            <div className={clsx(
-              "inline-block px-2 py-1 rounded text-xs mt-2",
-              subscription?.status === "ACTIVE" 
-                ? "bg-green-600/20 text-green-300" 
-                : "bg-orange-600/20 text-orange-300"
-            )}>
-              {subscription?.status || "No Subscription"}
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+          <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <h3 className="text-sm text-slate-300">Current Plan</h3>
+            <Users className="h-4 w-4 text-slate-400" />
+          </div>
+          <div className="text-xl font-semibold text-white">
+            {subscription?.planName ? `${subscription.planName}` : "Free Plan"}
+          </div>
+          <p className="text-xs text-slate-400 mt-1">
+            {subscription?.planCode && `Code: ${subscription.planCode}`}
+          </p>
+          {subscription?.planPriority !== null && (
+            <p className="text-xs text-slate-400 mt-1">Priority: {subscription.planPriority}</p>
+          )}
+          <div className={clsx(
+            "inline-block px-2 py-1 rounded text-xs mt-2",
+            subscription?.status === "ACTIVE" 
+              ? "bg-green-600/20 text-green-300" 
+              : "bg-orange-600/20 text-orange-300"
+          )}>
+            {subscription?.status || "No Subscription"}
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Daily Weight Quota</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {fmt(quotaToday?.remaining)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Used today: {fmt(usedToday)}
-            </p>
-            <div className="mt-3 h-2 bg-muted rounded overflow-hidden">
-              <div
-                className={clsx(
-                  "h-full transition-all",
-                  (quotaToday?.remaining ?? 0) > 0 ? "bg-green-500" : "bg-red-500"
-                )}
-                style={{
-                  width: `${
-                    Math.min(
-                      100,
-                      ((quotaToday?.dailyLimit ?? 0) === 0
-                        ? 0
-                        : (usedToday / (quotaToday?.dailyLimit ?? 1)) * 100)
-                    ).toFixed(1)
-                  }%`,
-                }}
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+          <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <h3 className="text-sm text-slate-300">Daily Weight Quota</h3>
+            <Activity className="h-4 w-4 text-slate-400" />
+          </div>
+          <div className="text-3xl font-bold text-white">
+            {fmt(quotaToday?.remaining)}
+          </div>
+          <p className="text-xs text-slate-400 mt-1">
+            Remaining: {fmt(quotaToday?.remaining)}
+          </p>
+          <div className="mt-3 h-2 bg-gray-800 rounded overflow-hidden">
+            <div
+              className={clsx(
+                "h-full transition-all",
+                (quotaToday?.remaining ?? 0) > 0 ? "bg-emerald-500" : "bg-red-500"
+              )}
+              style={{
+                width: `${
+                  Math.min(
+                    100,
+                    ((quotaToday?.dailyLimit ?? 0) === 0
+                      ? 0
+                      : (usedToday / (quotaToday?.dailyLimit ?? 1)) * 100)
+                  ).toFixed(1)
+                }%`,
+              }}
+            />
+          </div>
+          <p className="text-xs text-slate-400 mt-1">
+            Used today: {fmt(usedToday)}
+          </p>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Media</CardTitle>
-            <Database className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {fmt(mediaTotal)}
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+          <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <h3 className="text-sm text-slate-300">Plan Limits</h3>
+            <TrendingUp className="h-4 w-4 text-slate-400" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs">
+              <span className="text-slate-400">Concurrency:</span>
+              <span className="text-white">{entitlements?.concurrency || 1}</span>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Face fusion outputs
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Plan Limits</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">Concurrency:</span>
-                <span>{entitlements?.concurrency || 1}</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">Max Video:</span>
-                <span>{entitlements?.max_video_sec || 30}s</span>
-              </div>
-              <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">Resolution:</span>
-                <span>{entitlements?.max_resolution || "720p"}</span>
-              </div>
+            <div className="flex justify-between text-xs">
+              <span className="text-slate-400">Max Video:</span>
+              <span className="text-white">{entitlements?.max_video_sec || 30}s</span>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex justify-between text-xs">
+              <span className="text-slate-400">Resolution:</span>
+              <span className="text-white">{entitlements?.max_resolution || "720p"}</span>
+            </div>
+            <div className="flex justify-between text-xs">
+              <span className="text-slate-400">Watermark:</span>
+              <span className={entitlements?.watermark ? "text-red-300" : "text-green-300"}>
+                {entitlements?.watermark ? "Yes" : "No"}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Charts Section */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Job Status Distribution</CardTitle>
-            <CardDescription>
-              Distribution of job statuses
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {['SUCCEEDED', 'FAILED', 'RUNNING', 'QUEUED'].map(status => {
-                const count = recentJobs.filter(j => j.status === status).length;
-                const percentage = recentJobs.length > 0 ? (count / recentJobs.length) * 100 : 0;
-                return (
-                  <div key={status} className="flex items-center gap-3">
-                    <div className="w-16 text-xs text-muted-foreground">{status}</div>
-                    <div className="flex-1 h-6 bg-muted rounded overflow-hidden">
-                      <div
-                        className={clsx(
-                          "h-full transition-all",
-                          status === "SUCCEEDED" && "bg-green-500",
-                          status === "FAILED" && "bg-red-500",
-                          status === "RUNNING" && "bg-blue-500",
-                          status === "QUEUED" && "bg-yellow-500"
-                        )}
-                        style={{ width: `${percentage}%` }}
-                      />
-                    </div>
-                    <div className="w-8 text-xs text-muted-foreground">{count}</div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+          <h3 className="text-lg font-semibold mb-4 text-white">Job Status Distribution</h3>
+          <p className="text-slate-400 text-sm mb-4">Distribution of job statuses</p>
+          <div className="space-y-3">
+            {['SUCCEEDED', 'FAILED', 'RUNNING', 'QUEUED'].map(status => {
+              const count = recentJobs.filter(j => j.status === status).length;
+              const percentage = recentJobs.length > 0 ? (count / recentJobs.length) * 100 : 0;
+              return (
+                <div key={status} className="flex items-center gap-3">
+                  <div className="w-16 text-xs text-slate-400">{status}</div>
+                  <div className="flex-1 h-6 bg-gray-800 rounded overflow-hidden">
+                    <div
+                      className={clsx(
+                        "h-full transition-all",
+                        status === "SUCCEEDED" && "bg-emerald-500",
+                        status === "FAILED" && "bg-red-500",
+                        status === "RUNNING" && "bg-blue-500",
+                        status === "QUEUED" && "bg-yellow-500"
+                      )}
+                      style={{ width: `${percentage}%` }}
+                    />
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                  <div className="w-8 text-xs text-slate-400">{count}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Most Used Processors</CardTitle>
-            <CardDescription>
-              Top processor usage distribution
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-center mb-4">
-              <div className="relative w-32 h-32">
-                <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="40"
-                    fill="none"
-                    stroke="hsl(var(--muted))"
-                    strokeWidth="8"
-                  />
-                  
-                  {(() => {
-                    const processorCounts = recentJobs.reduce((acc, job) => {
-                      if (Array.isArray(job.processors)) {
-                        job.processors.forEach(proc => {
-                          acc[proc] = (acc[proc] || 0) + 1;
-                        });
-                      }
-                      return acc;
-                    }, {} as Record<string, number>);
-
-                    const totalUsage = Object.values(processorCounts).reduce((sum, count) => sum + count, 0);
-                    const colors = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'];
-                    
-                    let cumulativePercentage = 0;
-                    const circumference = 2 * Math.PI * 40;
-
-                    return Object.entries(processorCounts)
-                      .sort(([,a], [,b]) => b - a)
-                      .slice(0, 5)
-                      .map(([processor, count], index) => {
-                        const percentage = totalUsage > 0 ? count / totalUsage : 0;
-                        const strokeDasharray = `${percentage * circumference} ${circumference}`;
-                        const strokeDashoffset = -cumulativePercentage * circumference;
-                        cumulativePercentage += percentage;
-
-                        return (
-                          <circle
-                            key={processor}
-                            cx="60"
-                            cy="60"
-                            r="40"
-                            fill="none"
-                            stroke={colors[index]}
-                            strokeWidth="8"
-                            strokeDasharray={strokeDasharray}
-                            strokeDashoffset={strokeDashoffset}
-                            strokeLinecap="round"
-                          />
-                        );
-                      });
-                  })()}
-                </svg>
-              </div>
-            </div>
-            
-            <div className="space-y-1">
-              {(() => {
-                const processorCounts = recentJobs.reduce((acc, job) => {
-                  if (Array.isArray(job.processors)) {
-                    job.processors.forEach(proc => {
-                      acc[proc] = (acc[proc] || 0) + 1;
-                    });
-                  }
-                  return acc;
-                }, {} as Record<string, number>);
-
-                const colors = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'];
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+          <h3 className="text-lg font-semibold mb-4 text-white">Most Used Processors</h3>
+          <p className="text-slate-400 text-sm mb-4">Top processor usage distribution</p>
+          <div className="flex items-center justify-center mb-4">
+            <div className="relative w-32 h-32">
+              <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="40"
+                  fill="none"
+                  stroke="#374151"
+                  strokeWidth="8"
+                />
                 
-                return Object.entries(processorCounts)
-                  .sort(([,a], [,b]) => b - a)
-                  .slice(0, 5)
-                  .map(([processor, count], index) => (
-                    <div key={processor} className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <div 
-                          className="w-3 h-3 rounded-full" 
-                          style={{ backgroundColor: colors[index] }}
+                {(() => {
+                  const processorCounts = recentJobs.reduce((acc, job) => {
+                    if (Array.isArray(job.processors)) {
+                      job.processors.forEach(proc => {
+                        acc[proc] = (acc[proc] || 0) + 1;
+                      });
+                    }
+                    return acc;
+                  }, {} as Record<string, number>);
+
+                  const totalUsage = Object.values(processorCounts).reduce((sum, count) => sum + count, 0);
+                  const colors = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'];
+                  
+                  let cumulativePercentage = 0;
+                  const circumference = 2 * Math.PI * 40;
+
+                  return Object.entries(processorCounts)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 5)
+                    .map(([processor, count], index) => {
+                      const percentage = totalUsage > 0 ? count / totalUsage : 0;
+                      const strokeDasharray = `${percentage * circumference} ${circumference}`;
+                      const strokeDashoffset = -cumulativePercentage * circumference;
+                      cumulativePercentage += percentage;
+
+                      return (
+                        <circle
+                          key={processor}
+                          cx="60"
+                          cy="60"
+                          r="40"
+                          fill="none"
+                          stroke={colors[index]}
+                          strokeWidth="8"
+                          strokeDasharray={strokeDasharray}
+                          strokeDashoffset={strokeDashoffset}
+                          strokeLinecap="round"
                         />
-                        <span className="text-sm truncate max-w-24" title={processor}>
-                          {processor.replace(/_/g, ' ')}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span>{count}</span>
-                        <span className="text-xs text-muted-foreground">
-                          ({((count / Object.values(processorCounts).reduce((sum, c) => sum + c, 0)) * 100).toFixed(0)}%)
-                        </span>
-                      </div>
-                    </div>
-                  ));
-              })()}
-              
-              {recentJobs.length === 0 && (
-                <p className="text-xs text-muted-foreground text-center">No processor data yet</p>
-              )}
+                      );
+                    });
+                })()}
+              </svg>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          
+          <div className="space-y-1">
+            {(() => {
+              const processorCounts = recentJobs.reduce((acc, job) => {
+                if (Array.isArray(job.processors)) {
+                  job.processors.forEach(proc => {
+                    acc[proc] = (acc[proc] || 0) + 1;
+                  });
+                }
+                return acc;
+              }, {} as Record<string, number>);
+
+              const colors = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'];
+              
+              return Object.entries(processorCounts)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 5)
+                .map(([processor, count], index) => (
+                  <div key={processor} className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: colors[index] }}
+                      />
+                      <span className="text-slate-300 truncate max-w-24" title={processor}>
+                        {processor.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-400">{count}</span>
+                      <span className="text-xs text-slate-500">
+                        ({((count / Object.values(processorCounts).reduce((sum, c) => sum + c, 0)) * 100).toFixed(0)}%)
+                      </span>
+                    </div>
+                  </div>
+                ));
+            })()}
+            
+            {recentJobs.length === 0 && (
+              <p className="text-xs text-slate-400 text-center">No processor data yet</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Recent Jobs Table */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Recent Jobs</CardTitle>
-              <CardDescription>
-                Latest user job activities
-              </CardDescription>
-            </div>
-            <Button
-              onClick={() => router.push('/admin/explore')}
-              className="bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700"
-            >
-              <PlayCircle className="w-4 h-4 mr-2" />
-              New Job
-            </Button>
+      <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-base font-semibold text-white">Recent Jobs</h3>
+            <p className="text-slate-400 text-sm">Latest user job activities</p>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-auto">
-            <table className="w-full text-sm">
-              <thead className="text-muted-foreground">
-                <tr className="border-b">
-                  <th className="text-left py-3 pr-4">Job ID</th>
-                  <th className="text-left py-3 pr-4">Status</th>
-                  <th className="text-left py-3 pr-4">Processors</th>
-                  <th className="text-left py-3 pr-4">Created</th>
+          <a
+            href="/admin/explore"
+            className="inline-flex items-center gap-2 text-sm px-3 py-1.5 rounded"
+            style={{
+              background: "linear-gradient(90deg, #A0D45B 0%, #DDFFB1 34.55%, #7EBE2A 100%)",
+              color: "#0B1400",
+            }}
+          >
+            <PlayCircle className="w-3 h-3" />
+            New Job
+          </a>
+        </div>
+
+        <div className="overflow-auto">
+          <table className="w-full text-xs">
+            <thead className="text-slate-300">
+              <tr className="border-b border-gray-800">
+                <th className="text-left py-3 pr-4">Job ID</th>
+                <th className="text-left py-3 pr-4">Status</th>
+                <th className="text-left py-3 pr-4">Processors</th>
+                <th className="text-left py-3 pr-4">Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentJobs.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-8 text-center text-slate-400">
+                    No recent jobs found.
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {currentJobs.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="py-8 text-center text-muted-foreground">
-                      No recent jobs found.
+              ) : (
+                currentJobs.map((j) => (
+                  <tr key={j.id} className="border-b border-gray-900/60">
+                    <td className="py-3 pr-4 font-mono text-slate-300">{j.id.substring(0, 8)}...</td>
+                    <td className="py-3 pr-4">
+                      <span
+                        className={clsx(
+                          "px-1.5 py-0.5 rounded text-xs",
+                          j.status === "SUCCEEDED" && "bg-emerald-600/20 text-emerald-300",
+                          j.status === "FAILED" && "bg-red-600/20 text-red-300",
+                          j.status === "RUNNING" && "bg-blue-600/20 text-blue-300",
+                          j.status === "QUEUED" && "bg-yellow-600/20 text-yellow-300"
+                        )}
+                      >
+                        {j.status}
+                      </span>
+                    </td>
+                    <td className="py-3 pr-4 truncate max-w-32 text-slate-300">
+                      {Array.isArray(j.processors) ? j.processors.join(", ") : "-"}
+                    </td>
+                    <td className="py-3 pr-4 text-slate-400">
+                      {new Date(j.createdAt ?? "").toLocaleDateString()}
                     </td>
                   </tr>
-                ) : (
-                  currentJobs.map((j) => (
-                    <tr key={j.id} className="border-b">
-                      <td className="py-3 pr-4 font-mono text-xs">{j.id.substring(0, 8)}...</td>
-                      <td className="py-3 pr-4">
-                        <Badge
-                          variant={
-                            j.status === "SUCCEEDED" ? "default" :
-                            j.status === "FAILED" ? "destructive" :
-                            j.status === "RUNNING" ? "secondary" : "outline"
-                          }
-                        >
-                          {j.status}
-                        </Badge>
-                      </td>
-                      <td className="py-3 pr-4 truncate max-w-32">
-                        {Array.isArray(j.processors) ? j.processors.join(", ") : "-"}
-                      </td>
-                      <td className="py-3 pr-4 text-muted-foreground">
-                        {new Date(j.createdAt ?? "").toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-4 pt-4 border-t">
-              <div className="text-sm text-muted-foreground">
-                Page {currentPage + 1} of {totalPages} ({recentJobs.length} total)
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                  disabled={currentPage === 0}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
-                  disabled={currentPage === totalPages - 1}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-800">
+            <div className="text-xs text-slate-400">
+              Page {currentPage + 1} of {totalPages} ({recentJobs.length} total)
             </div>
-          )}
-        </CardContent>
-      </Card>
+            <div className="flex items-center gap-1">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                disabled={currentPage === 0}
+                className="h-7 w-7 p-0 text-slate-300 hover:text-white hover:bg-gray-800"
+              >
+                <ChevronLeft className="w-3 h-3" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
+                disabled={currentPage === totalPages - 1}
+                className="h-7 w-7 p-0 text-slate-300 hover:text-white hover:bg-gray-800"
+              >
+                <ChevronRight className="w-3 h-3" />
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>
-            Common administrative tasks
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
+      <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
+        <h3 className="text-lg font-semibold mb-4 text-white">Quick Actions</h3>
+        <p className="text-slate-400 text-sm mb-4">Common administrative tasks</p>
+        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
           <Button 
-            variant="outline"
+            variant="ghost"
             onClick={() => router.push('/admin/user')}
-            className="justify-start"
+            className="justify-start text-slate-300 hover:text-white hover:bg-gray-800"
           >
             Manage Users
           </Button>
           <Button 
-            variant="outline"
+            variant="ghost"
             onClick={() => router.push('/admin/library')}
-            className="justify-start"
+            className="justify-start text-slate-300 hover:text-white hover:bg-gray-800"
           >
             View Media Library
           </Button>
           <Button 
-            variant="outline"
+            variant="ghost"
             onClick={() => router.push('/admin/subscription')}
-            className="justify-start"
+            className="justify-start text-slate-300 hover:text-white hover:bg-gray-800"
           >
             Subscription Management
           </Button>
           <Button 
-            variant="outline"
+            variant="ghost"
             onClick={() => router.push('/admin/feature')}
-            className="justify-start"
+            className="justify-start text-slate-300 hover:text-white hover:bg-gray-800"
           >
             Feature Settings
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
@@ -550,15 +533,15 @@ function DashboardContent() {
 // Loading component
 function DashboardLoading() {
   return (
-    <div className="p-6 space-y-6">
+    <div className="relative z-[60] pointer-events-auto text-white p-6 space-y-6">
       <div className="animate-pulse">
-        <div className="h-8 bg-gray-200 rounded w-1/4 mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+        <div className="h-8 bg-gray-800 rounded w-1/4 mb-2"></div>
+        <div className="h-4 bg-gray-800 rounded w-1/3"></div>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[...Array(4)].map((_, i) => (
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {[...Array(6)].map((_, i) => (
           <div key={i} className="animate-pulse">
-            <div className="h-24 bg-gray-200 rounded"></div>
+            <div className="h-32 bg-gray-900 border border-gray-800 rounded-lg"></div>
           </div>
         ))}
       </div>
