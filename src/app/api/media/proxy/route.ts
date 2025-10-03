@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getS3Client } from "@/lib/s3Client";
 
@@ -15,20 +14,47 @@ export async function GET(req: NextRequest) {
 
     const client = getS3Client();
 
-    // Signed URL untuk streaming inline
-    const signed = await getSignedUrl(
-      client,
-      new GetObjectCommand({
-        Bucket: bucket,
-        Key: key,
-        // Opsi override mime kalau perlu:
-        // ResponseContentType: "video/mp4",
-      }),
-      { expiresIn: 60 } // 60 detik cukup; boleh dinaikkan
-    );
+    // Get object directly and stream it
+    const command = new GetObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    });
 
-    // Redirect 302 ke signed URL MinIO
-    return Response.redirect(signed, 302);
+    const response = await client.send(command);
+    
+    if (!response.Body) {
+      return new Response("File not found", { status: 404 });
+    }
+
+    // Convert stream to array buffer
+    const chunks = [];
+    const reader = response.Body.transformToWebStream().getReader();
+    
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+    }
+
+    const arrayBuffer = new Uint8Array(
+      chunks.reduce((acc, chunk) => acc + chunk.length, 0)
+    );
+    
+    let offset = 0;
+    for (const chunk of chunks) {
+      arrayBuffer.set(chunk, offset);
+      offset += chunk.length;
+    }
+
+    // Return the file with proper headers
+    return new Response(arrayBuffer, {
+      headers: {
+        'Content-Type': response.ContentType || 'application/octet-stream',
+        'Content-Length': response.ContentLength?.toString() || '',
+        'Cache-Control': 'public, max-age=3600',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
   } catch (error) {
     console.error('Media proxy error:', error);
     return new Response(`Proxy error: ${error instanceof Error ? error.message : 'Unknown error'}`, { status: 500 });

@@ -198,57 +198,22 @@ export default function AdminLibrary() {
                             }}
                           />
                         ) : isImage ? (
-                          <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-                            {/* Try proxy URL first */}
-                            <img 
-                              src={urlProxy}
-                              alt={a.objectKey}
-                              style={{ 
-                                width: '100%', 
-                                height: '100%', 
-                                objectFit: 'cover',
-                                display: 'block',
-                                border: '2px solid blue'
-                              }}
-                              onLoad={(e) => {
-                                console.log('✅ Proxy image loaded:', urlProxy);
-                                e.currentTarget.style.border = 'none';
-                              }}
-                              onError={(e) => {
-                                console.error('❌ Proxy failed, trying direct URL:', urlProxy);
-                                e.currentTarget.style.display = 'none';
-                                
-                                // Show direct URL fallback
-                                const fallback = e.currentTarget.nextElementSibling as HTMLImageElement;
-                                if (fallback) fallback.style.display = 'block';
-                              }}
-                            />
-                            
-                            {/* Fallback to direct URL */}
-                            <img 
-                              src={urlDirect}
-                              alt={a.objectKey}
-                              style={{ 
-                                width: '100%', 
-                                height: '100%', 
-                                objectFit: 'cover',
-                                display: 'none',
-                                border: '2px solid green',
-                                position: 'absolute',
-                                top: 0,
-                                left: 0
-                              }}
-                              onLoad={(e) => {
-                                console.log('✅ Direct image loaded:', urlDirect);
-                                e.currentTarget.style.border = 'none';
-                              }}
-                              onError={(e) => {
-                                console.error('❌ Both proxy and direct failed');
-                                console.error('Proxy URL:', urlProxy);
-                                console.error('Direct URL:', urlDirect);
-                              }}
-                            />
-                          </div>
+                          <img 
+                            src={urlProxy}
+                            alt={a.objectKey}
+                            style={{ 
+                              width: '100%', 
+                              height: '100%', 
+                              objectFit: 'cover',
+                              display: 'block'
+                            }}
+                            onLoad={(e) => {
+                              console.log('✅ Image loaded via proxy:', urlProxy);
+                            }}
+                            onError={(e) => {
+                              console.error('❌ Proxy failed:', urlProxy);
+                            }}
+                          />
                         ) : isAudio ? (
                           <audio controls className="w-full">
                             <source src={urlDirect} type={a.mimeType} />
