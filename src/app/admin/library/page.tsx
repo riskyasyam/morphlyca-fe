@@ -39,6 +39,13 @@ function typeIcon(type: string) {
   return <FileType className="w-4 h-4" />;
 }
 
+function buildDirectUrl(asset: MediaAsset) {
+  const baseUrl = process.env.NEXT_PUBLIC_MINIO_PUBLIC_BASE || '';
+  const directUrl = `${baseUrl}/${asset.bucket}/${asset.objectKey}`;
+  console.log('Building direct URL:', { baseUrl, bucket: asset.bucket, objectKey: asset.objectKey, directUrl });
+  return directUrl;
+}
+
 export default function AdminLibrary() {
   const [loading, setLoading] = useState(true);
   const [assets, setAssets] = useState<MediaAsset[]>([]);
@@ -167,6 +174,7 @@ export default function AdminLibrary() {
                 {items.map((a) => {
                   const urlProxy = buildProxyUrl(a);
                   const urlDownload = buildDownloadUrl(a);
+                  const urlDirect = buildDirectUrl(a);
                   const isVideo = a.mimeType.startsWith("video/");
                   const isImage = a.mimeType.startsWith("image/");
                   const isAudio = a.mimeType.startsWith("audio/");
@@ -182,18 +190,28 @@ export default function AdminLibrary() {
                       <div className="relative z-0 aspect-video bg-gray-900/40 flex items-center justify-center">
                         {isVideo && (
                           <video
-                            src={urlProxy}
+                            src={urlDirect}
                             controls
                             className="w-full h-full object-cover block"
                             preload="metadata"
+                            onError={(e) => {
+                              console.error('Video failed to load:', e.currentTarget.src);
+                            }}
                           />
                         )}
                         {isImage && (
-                          <img src={urlProxy} alt={a.objectKey} className="w-full h-full object-cover block" />
+                          <img 
+                            src={urlDirect} 
+                            alt={a.objectKey} 
+                            className="w-full h-full object-cover block"
+                            onError={(e) => {
+                              console.error('Image failed to load:', e.currentTarget.src);
+                            }}
+                          />
                         )}
                         {isAudio && (
                           <audio controls className="w-full">
-                            <source src={urlProxy} type={a.mimeType} />
+                            <source src={urlDirect} type={a.mimeType} />
                           </audio>
                         )}
                         {!isVideo && !isImage && !isAudio && (
@@ -225,7 +243,7 @@ export default function AdminLibrary() {
 
                         <div className="pt-1 flex items-center gap-4">
                           <a
-                            href={urlProxy}
+                            href={urlDirect}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="relative z-20 text-xs text-blue-400 hover:text-blue-300 underline"
