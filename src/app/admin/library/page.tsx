@@ -186,7 +186,7 @@ export default function AdminLibrary() {
                       className="group relative rounded-lg overflow-hidden border border-gray-800 bg-black hover:bg-gray-900/30 transition-colors"
                     >
                       {/* Preview */}
-                      <div className="relative z-0 aspect-video bg-gray-900/40 flex items-center justify-center overflow-hidden">
+                      <div className="relative w-full h-64 bg-gray-900/40 flex items-center justify-center overflow-hidden">
                         {isVideo ? (
                           <video
                             src={urlDirect}
@@ -198,9 +198,18 @@ export default function AdminLibrary() {
                             }}
                           />
                         ) : isImage ? (
-                          <div 
-                            className="w-full h-full bg-cover bg-center bg-no-repeat"
-                            style={{ backgroundImage: `url(${urlDirect})` }}
+                          <img 
+                            src={urlDirect}
+                            alt={a.objectKey}
+                            style={{ 
+                              width: '100%', 
+                              height: '100%', 
+                              objectFit: 'cover',
+                              display: 'block',
+                              border: '2px solid red' // untuk debug
+                            }}
+                            onLoad={() => console.log('✅ Image loaded:', urlDirect)}
+                            onError={() => console.error('❌ Image error:', urlDirect)}
                           />
                         ) : isAudio ? (
                           <audio controls className="w-full">
