@@ -42,7 +42,6 @@ function typeIcon(type: string) {
 function buildDirectUrl(asset: MediaAsset) {
   const baseUrl = process.env.NEXT_PUBLIC_MINIO_PUBLIC_BASE || '';
   const directUrl = `${baseUrl}/${asset.bucket}/${asset.objectKey}`;
-  console.log('Building direct URL:', { baseUrl, bucket: asset.bucket, objectKey: asset.objectKey, directUrl });
   return directUrl;
 }
 
@@ -181,9 +180,6 @@ export default function AdminLibrary() {
 
                   const shortName = a.objectKey.split("/").slice(-2).join("/");
 
-                  // Debug info
-                  console.log('Media item:', { id: a.id, isImage, isVideo, urlDirect, mimeType: a.mimeType });
-
                   return (
                     <article
                       key={a.id}
@@ -202,41 +198,16 @@ export default function AdminLibrary() {
                             }}
                           />
                         ) : isImage ? (
-                          <div className="w-full h-full relative bg-red-500/20">
-                            <img 
-                              src={urlDirect} 
-                              alt={a.objectKey} 
-                              className="absolute inset-0 w-full h-full object-cover"
-                              style={{ display: 'block', maxWidth: 'none' }}
-                              onError={(e) => {
-                                console.error('Image failed to load:', e.currentTarget.src);
-                                // Fallback to background image if img tag fails
-                                const parent = e.currentTarget.parentElement;
-                                if (parent) {
-                                  parent.style.backgroundImage = `url(${urlDirect})`;
-                                  parent.style.backgroundSize = 'cover';
-                                  parent.style.backgroundPosition = 'center';
-                                  e.currentTarget.style.display = 'none';
-                                }
-                              }}
-                              onLoad={(e) => {
-                                console.log('Image loaded successfully:', e.currentTarget.src);
-                              }}
-                            />
-                            <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
-                              IMG: {isImage ? 'YES' : 'NO'}
-                            </div>
-                          </div>
+                          <div 
+                            className="w-full h-full bg-cover bg-center bg-no-repeat"
+                            style={{ backgroundImage: `url(${urlDirect})` }}
+                          />
                         ) : isAudio ? (
                           <audio controls className="w-full">
                             <source src={urlDirect} type={a.mimeType} />
                           </audio>
                         ) : (
-                          <div className="text-slate-400 text-sm p-4 text-center">
-                            No preview<br />
-                            Type: {a.mimeType}<br />
-                            isImage: {isImage.toString()}
-                          </div>
+                          <div className="text-slate-400 text-sm p-4 text-center">No preview</div>
                         )}
                       </div>
 
