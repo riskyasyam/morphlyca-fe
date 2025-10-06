@@ -57,6 +57,7 @@ export default function AdminNavbar() {
     "/admin/feature": "Feature",
     "/admin/explore": "Explore",
     "/admin/library": "My Media",
+    "/admin/entitlements": "Entitlements",
   };
 
   // Ambil judul sesuai path, fallback ke "Dashboard"

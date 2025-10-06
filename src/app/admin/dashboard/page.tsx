@@ -141,7 +141,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className="relative z-[60] pointer-events-auto text-white p-6 space-y-6">
+    <div className="relative pointer-events-auto text-white p-6 space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold mb-1">Welcome, {me?.displayName ?? "User"}</h2>

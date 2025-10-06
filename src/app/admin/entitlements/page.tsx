@@ -3,6 +3,7 @@
 import { useState } from "react";
 import EntitlementsTable from "@/components/admin/entitlements/EntitlementsTable";
 
+
 export default function EntitlementsPage() {
   return (
          <div className="space-y-6">
