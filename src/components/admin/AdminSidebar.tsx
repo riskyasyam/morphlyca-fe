@@ -3,6 +3,16 @@ import { useState, useEffect } from "react";
 import { Search, Compass, Library, LogOut, Home, User, Podcast, Notebook, Cpu, Crown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { handleLogout as authLogout } from "@/lib/auth";
@@ -16,6 +26,10 @@ export default function AdminSidebar() {
   const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+
   
   const menuItems = [
     { icon: Home, label: "Dashboard", href: "/admin/dashboard" },
@@ -43,10 +57,8 @@ export default function AdminSidebar() {
     loadUserData();
   }, []);
 
-  const handleLogout = async () => {
-    const isConfirmed = window.confirm("Are you sure you want to logout?");
-    if (!isConfirmed) return;
-    
+  const handleLogoutConfirm = async () => {
+    setIsLoggingOut(true);
     try {
       await authLogout(); // This will clear tokens and cookies
       router.push("/");
@@ -54,6 +66,9 @@ export default function AdminSidebar() {
       console.error("Logout failed:", error);
       // Even if logout fails, redirect to login page
       router.push("/");
+    } finally {
+      setIsLoggingOut(false);
+      setShowLogoutDialog(false);
     }
   };
 
@@ -150,7 +165,7 @@ export default function AdminSidebar() {
       <div className="absolute bottom-4 left-4 right-4">
         <Button 
           variant="ghost" 
-          onClick={handleLogout} 
+          onClick={() => setShowLogoutDialog(true)} 
           className="w-full justify-start text-gray-400 hover:text-red-400 hover:bg-gray-800 transition-colors cursor-pointer"
         >
           <LogOut className="w-5 h-5 mr-3" /> 
@@ -160,6 +175,43 @@ export default function AdminSidebar() {
 
       {/* Search Modal */}
       <SearchModal isOpen={isSearchModalOpen} onClose={() => setIsSearchModalOpen(false)} />
+
+      {/* Logout Confirmation Dialog */}
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <LogOut className="h-5 w-5 text-red-400" />
+              Confirm Logout
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to logout? You will need to sign in again to access your account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLoggingOut}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleLogoutConfirm}
+              disabled={isLoggingOut}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isLoggingOut ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Logging out...
+                </>
+              ) : (
+                <>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Yes, Logout
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
