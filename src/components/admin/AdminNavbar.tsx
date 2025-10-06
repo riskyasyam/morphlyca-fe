@@ -1,5 +1,5 @@
 "use client";
-import { Bell, Settings, User } from "lucide-react";
+import { Bell, Settings, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -10,8 +10,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { usePathname, useRouter } from "next/navigation";
 import { handleLogout as authLogout } from "@/lib/auth";
+import { useState } from "react";
 
 
 
@@ -19,11 +30,11 @@ import { handleLogout as authLogout } from "@/lib/auth";
 export default function AdminNavbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const handleLogout = async () => {
-    const isConfirmed = window.confirm("Are you sure you want to logout?");
-    if (!isConfirmed) return;
-    
+  const handleLogoutConfirm = async () => {
+    setIsLoggingOut(true);
     try {
       await authLogout(); // This will clear tokens and cookies
       router.push("/");
@@ -31,6 +42,9 @@ export default function AdminNavbar() {
       console.error("Logout failed:", error);
       // Even if logout fails, redirect to login page
       router.push("/");
+    } finally {
+      setIsLoggingOut(false);
+      setShowLogoutDialog(false);
     }
   };
 
@@ -88,14 +102,52 @@ export default function AdminNavbar() {
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-gray-700" />
               <DropdownMenuItem 
-                onClick={handleLogout}
-                className="text-red-400 hover:bg-gray-800 hover:text-red-300">
+                onClick={() => setShowLogoutDialog(true)}
+                className="text-red-400 hover:bg-gray-800 hover:text-red-300 cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" />
                 Log out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <LogOut className="h-5 w-5 text-red-400" />
+              Confirm Logout
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to logout? You will need to sign in again to access your account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLoggingOut}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleLogoutConfirm}
+              disabled={isLoggingOut}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {isLoggingOut ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Logging out...
+                </>
+              ) : (
+                <>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Yes, Logout
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </nav>
   );
 }

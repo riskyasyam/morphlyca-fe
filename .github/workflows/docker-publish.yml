@@ -38,3 +38,13 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/morphlyca-fe:latest
           cache-to: type=inline
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_FRONTEND_URL=${{ vars.NEXT_PUBLIC_FRONTEND_URL }}
+            NEXT_PUBLIC_PRIMEAUTH_AUTH_SERVICE_URL=${{ vars.NEXT_PUBLIC_PRIMEAUTH_AUTH_SERVICE_URL }}
+            NEXT_PUBLIC_PRIMEAUTH_REALM_ID=${{ vars.NEXT_PUBLIC_PRIMEAUTH_REALM_ID }}
+            NEXT_PUBLIC_PRIMEAUTH_CLIENT_ID=${{ vars.NEXT_PUBLIC_PRIMEAUTH_CLIENT_ID }}
+            NEXT_PUBLIC_PRIMEAUTH_REDIRECT_URI=${{ vars.NEXT_PUBLIC_PRIMEAUTH_REDIRECT_URI }}
+            NEXT_PUBLIC_PRIMEAUTH_TOKEN_URL=${{ vars.NEXT_PUBLIC_PRIMEAUTH_TOKEN_URL }}
+            NEXT_PUBLIC_MINIO_PUBLIC_BASE=${{ vars.NEXT_PUBLIC_MINIO_PUBLIC_BASE }}
+            NEXT_PUBLIC_MINIO_ALLOWED_PREFIX=${{ vars.NEXT_PUBLIC_MINIO_ALLOWED_PREFIX }}
