@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Search, Compass, Library, LogOut, Home, User, Podcast, Notebook, Cpu, Crown } from "lucide-react";
+import { Search, Compass, Library, LogOut, Home, User, Podcast, Notebook, Cpu, Crown, History } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,6 +38,7 @@ export default function AdminSidebar() {
     { icon: Crown, label: "Entitlements", href: "/admin/entitlements" },
     { icon: Cpu, label: "Feature", href: "/admin/feature" },
     { icon: Podcast, label: "Subscription", href: "/admin/subscription" },
+    { icon: History, label: "History User", href: "/admin/history" },
     { icon: Compass, label: "Explore", href: "/admin/explore" },
     { icon: Library, label: "My Media", href: "/admin/library" },
   ];
@@ -122,7 +123,7 @@ export default function AdminSidebar() {
             </p>
             {menuItems
               .filter((item) =>
-                ["User", "Subscription", "Plan", "Entitlements", "Feature"].includes(item.label)
+                ["User", "Subscription", "Plan", "Entitlements", "Feature", "History User"].includes(item.label)
               )
               .map((item, index) => (
                 <Link key={index} href={item.href}>
