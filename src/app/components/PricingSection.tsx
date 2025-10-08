@@ -18,7 +18,7 @@ const PricingSection = () => {
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Basic Plan */}
-          <div className="relative rounded-2xl p-8 border border-gray-700 bg-[url('/images/basic-plan.png')] backdrop-blur-sm hover:scale-[1.03] transition-transform ">
+          <div className="relative rounded-2xl p-8 border border-gray-700 bg-[url('/images/basic_plan.svg')] backdrop-blur-sm hover:scale-[1.03] transition-transform ">
             <div className="mb-6">
               <h3 className="text-white/80 text-sm mb-2">Basic Plan</h3>
               <div className="text-4xl font-bold mb-2">Free</div>
@@ -52,7 +52,7 @@ const PricingSection = () => {
           </div>
 
           {/* Premium Plan */}
-          <div className="relative rounded-2xl p-8 border border-gray-700 bg-[url('/images/basic-plan.png')] backdrop-blur-sm hover:scale-[1.03] transition-transform">
+          <div className="relative rounded-2xl p-8 border border-gray-700 bg-[url('/images/basic_plan.svg')] backdrop-blur-sm hover:scale-[1.03] transition-transform">
             <div className="mb-6">
               <h3 className="text-white/80 text-sm mb-2">Premium Plan</h3>
               <div className="text-4xl font-bold mb-1">
@@ -88,7 +88,7 @@ const PricingSection = () => {
           </div>
 
           {/* Professional Plan */}
-          <div className="relative rounded-2xl p-8 border border-gray-700 bg-[url('/images/basic-plan.png')] backdrop-blur-sm hover:scale-[1.03] transition-transform">
+          <div className="relative rounded-2xl p-8 border border-gray-700 bg-[url('/images/basic_plan.svg')] backdrop-blur-sm hover:scale-[1.03] transition-transform">
             <div className="mb-6">
               <h3 className="text-white/80 text-sm mb-2">Professional Plan</h3>
               <div className="text-4xl font-bold mb-1">
