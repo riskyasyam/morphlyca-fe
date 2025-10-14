@@ -182,7 +182,7 @@ function LoginContent() {
             
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold py-3 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-full bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary text-black text-sm md:text-base px-6 md:px-8 py-3 md:py-4 rounded-lg hover:opacity-90 transition font-semibold "
               disabled={loading}
             >
               {loading ? "Loading..." : "Login"}
@@ -195,7 +195,7 @@ function LoginContent() {
                 <button
                   type="button"
                   onClick={handleDebugTest}
-                  className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2"
+                  className="w-full sm:w-full bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary text-black text-sm md:text-base px-6 md:px-8 py-3 md:py-4 rounded-lg hover:opacity-90 transition font-semibold"
                   disabled={loading}
                 >
                   <Bug className="w-4 h-4" />
@@ -216,14 +216,14 @@ function LoginContent() {
                     🔗 Endpoint: /api/v1/auth/login (working in debug mode)
                     <br />
                     💡 Production endpoint needs response structure fix
-                  </div>
+                  </div>AAAFFF
                 </div>
               </div>
             )}
             <button
               type="button"
               onClick={handlePrimeLogin}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-full bg-gradient-to-r from-blue-primary via-blue-foreground to-blue-secondary text-black text-sm md:text-base px-6 md:px-8 py-3 md:py-4 rounded-lg hover:opacity-90 transition font-semibold"
               disabled={loading}
             >
               {loading ? "Loading..." : "Login dengan PrimeAuth"}

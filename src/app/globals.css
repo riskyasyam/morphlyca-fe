@@ -45,6 +45,9 @@
   --color-green-primary: #A0D45B;
   --color-green-foreground: #DDFFB1;
   --color-green-secondary: #7EBE2A;
+  --color-blue-primary: #4655FF;
+  --color-blue-foreground: #A39DFF;
+  --color-blue-secondary: #3543E3;
 }
 
 :root {

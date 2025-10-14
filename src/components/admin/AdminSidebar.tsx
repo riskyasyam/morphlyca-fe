@@ -161,7 +161,7 @@ export default function AdminSidebar() {
             ))}
         </div>
       </nav>
-
+ 
       {/* Logout */}
       <div className="absolute bottom-4 left-4 right-4">
         <Button 
@@ -196,7 +196,7 @@ export default function AdminSidebar() {
             <AlertDialogAction 
               onClick={handleLogoutConfirm}
               disabled={isLoggingOut}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-green-600 hover:bg-green-700"
             >
               {isLoggingOut ? (
                 <>

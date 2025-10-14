@@ -56,15 +56,6 @@ const EntitlementsTable = () => {
     }
   };
 
-  const getPlanBadgeClass = (planCode: string) => {
-    switch (planCode?.toUpperCase()) {
-      case 'FREE': return "bg-gray-600 hover:bg-gray-700 text-gray-100";
-      case 'PREMIUM': return "bg-blue-600 hover:bg-blue-700 text-white";
-      case 'PRO': return "bg-yellow-600 hover:bg-yellow-700 text-white";
-      default: return "bg-gray-600 hover:bg-gray-700 text-gray-100";
-    }
-  };
-
   const getResolutionBadge = (resolution: string) => {
     const colors = {
       '480p': 'bg-red-600/20 text-red-300',
@@ -177,9 +168,6 @@ const EntitlementsTable = () => {
                       {getPlanIcon(entitlement.plan.code)}
                       <div>
                         <p className="font-medium text-white">{entitlement.plan.name}</p>
-                        <Badge className={getPlanBadgeClass(entitlement.plan.code)}>
-                          {entitlement.plan.code}
-                        </Badge>
                       </div>
                     </div>
                   </TableCell>
