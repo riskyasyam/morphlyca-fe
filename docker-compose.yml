@@ -1,29 +1,25 @@
-# version: "3.8"   # (boleh dihapus; compose modern nggak perlu)
+# docker-compose.yml
 
 services:
   morphlyca-frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
-        NEXT_PUBLIC_FRONTEND_URL: ${NEXT_PUBLIC_FRONTEND_URL}
-        NEXT_PUBLIC_PRIMEAUTH_AUTH_SERVICE_URL: ${NEXT_PUBLIC_PRIMEAUTH_AUTH_SERVICE_URL}
-        NEXT_PUBLIC_PRIMEAUTH_REALM_ID: ${NEXT_PUBLIC_PRIMEAUTH_REALM_ID}
-        NEXT_PUBLIC_PRIMEAUTH_CLIENT_ID: ${NEXT_PUBLIC_PRIMEAUTH_CLIENT_ID}
-        NEXT_PUBLIC_PRIMEAUTH_REDIRECT_URI: ${NEXT_PUBLIC_PRIMEAUTH_REDIRECT_URI}
-        NEXT_PUBLIC_PRIMEAUTH_TOKEN_URL: ${NEXT_PUBLIC_PRIMEAUTH_TOKEN_URL}
-        NEXT_PUBLIC_MINIO_PUBLIC_BASE: ${NEXT_PUBLIC_MINIO_PUBLIC_BASE}
-        NEXT_PUBLIC_MINIO_ALLOWED_PREFIX: ${NEXT_PUBLIC_MINIO_ALLOWED_PREFIX}
+    image: adminmeetaza/morphlyca-fe:latest   # ← tarik image dari Docker Hub
+    container_name: morphlyca-frontend
+
+    # (opsional) selalu tarik image terbaru saat up, kalau Compose kamu mendukung:
+    # pull_policy: always
+
+    # semua NEXT_PUBLIC_* didefinisikan di file ini
+    # entrypoint di image akan menulisnya ke /public/runtime-env.js saat start
     env_file:
       - .env.production
+
     ports:
       - "3001:3000"
     networks:
       - morphlyca-network
     restart: unless-stopped
 
-    # Perbaiki healthcheck: wget -f itu salah. Pakai curl -fS, atau wget -qO-.
+    # Healthcheck (perbaikan: pakai curl -fsS)
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:3000/api/health || exit 1"]
       interval: 30s
