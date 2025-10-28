@@ -29,9 +29,19 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Clear invalid token
       localStorage.removeItem('token');
-      // Redirect to login if not already there
-      if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user');
+      
+      // Only redirect to login if user is on an admin/protected route
+      if (typeof window !== 'undefined') {
+        const currentPath = window.location.pathname;
+        const isAdminRoute = currentPath.startsWith('/admin');
+        const isLoginPage = currentPath.includes('/login');
+        
+        // Only redirect if on admin route and not already on login page
+        if (isAdminRoute && !isLoginPage) {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);

@@ -40,7 +40,7 @@ export default function AdminNavbar() {
       router.push("/");
     } catch (error) {
       console.error("Logout failed:", error);
-      // Even if logout fails, redirect to login page
+      // Even if logout fails, redirect to home page
       router.push("/");
     } finally {
       setIsLoggingOut(false);

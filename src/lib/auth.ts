@@ -166,6 +166,10 @@ export async function handleLogout(): Promise<void> {
   } finally {
     // Always clear local storage
     localStorage.removeItem('user');
+    // Also remove any access/refresh tokens stored in localStorage (defensive)
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('token');
+    localStorage.removeItem('refresh_token');
     
     // Clear HTTP-only cookies (access_token and refresh_token)
     // Note: HTTP-only cookies can't be cleared from frontend directly
@@ -176,6 +180,12 @@ export async function handleLogout(): Promise<void> {
     document.cookie = 'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     document.cookie = 'refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     
+    // Dispatch custom logout event so Navbar and other components update immediately
+    try {
+      window.dispatchEvent(new CustomEvent('auth:logout'));
+    } catch (e) {
+      // ignore if dispatch fails in non-browser env
+    }
     // Note: Component should handle redirect after calling this function
   }
 }

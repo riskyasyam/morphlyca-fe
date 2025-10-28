@@ -1,11 +1,59 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hasToken, setHasToken] = useState(false);
+
+  useEffect(() => {
+    // Quick check: if no token in localStorage, immediately show logged out state
+    const checkAuth = () => {
+      if (typeof window === 'undefined') return setHasToken(false);
+      
+      // First check localStorage for immediate feedback
+      const hasLocalToken = !!(
+        localStorage.getItem('access_token') || 
+        localStorage.getItem('token') || 
+        localStorage.getItem('user')
+      );
+      
+      setHasToken(hasLocalToken);
+    };
+
+    // Listen for custom logout event to immediately update UI
+    const handleAuthChange = () => {
+      console.log('🔄 Auth change event received');
+      checkAuth();
+    };
+
+    checkAuth();
+    
+    // re-check when the user returns to the tab
+    window.addEventListener('focus', checkAuth);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') checkAuth();
+    });
+    
+    // Listen for logout event
+    window.addEventListener('auth:logout', handleAuthChange);
+    
+    // Also listen to storage events (for cross-tab)
+    window.addEventListener('storage', checkAuth);
+
+    // Polling fallback: check every 2s
+    const interval = setInterval(checkAuth, 2000);
+
+    return () => {
+      window.removeEventListener('focus', checkAuth);
+      document.removeEventListener('visibilitychange', checkAuth as any);
+      window.removeEventListener('auth:logout', handleAuthChange);
+      window.removeEventListener('storage', checkAuth);
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-sm">
@@ -30,9 +78,15 @@ export default function Navbar() {
         </ul>
 
         {/* Desktop CTA Button */}
-        <Link href="/login" className="hidden lg:block px-4 xl:px-6 py-4 text-xs xl:text-[13px] font-medium text-dark bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary rounded-lg hover:opacity-90 transition-opacity duration-200 shadow-[-20px_4px_40px_0px_#DBFFAA40]">
-          Get Started
-        </Link>
+        {hasToken ? (
+          <Link href="/admin/dashboard" className="hidden lg:block px-4 xl:px-6 py-4 text-xs xl:text-[13px] font-medium text-black bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary rounded-lg hover:opacity-90 transition-opacity duration-200 shadow-[-20px_4px_40px_0px_#DBFFAA40]">
+            Dashboard
+          </Link>
+        ) : (
+          <Link href="/login" className="hidden lg:block px-4 xl:px-6 py-4 text-xs xl:text-[13px] font-medium text-dark bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary rounded-lg hover:opacity-90 transition-opacity duration-200 shadow-[-20px_4px_40px_0px_#DBFFAA40]">
+            Get Started
+          </Link>
+        )}
 
         {/* Mobile Menu Button */}
         <button 
@@ -58,9 +112,15 @@ export default function Navbar() {
             <li><a href="#pricing" className="block hover:text-green-400 transition-colors">Pricing</a></li>
             <li><a href="#testimonials" className="block hover:text-green-400 transition-colors">Testimonial</a></li>
             <li className="pt-4">
-              <button className="w-full px-6 py-3 text-sm font-medium text-black bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary shadow-[-20px_4px_40px_0px_#DBFFAA40] rounded-lg hover:opacity-90 transition-opacity duration-200">
-                Get Started
-              </button>
+              {hasToken ? (
+                <Link href="/admin/dashboard" className="w-full px-6 py-3 text-sm font-medium text-black bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary shadow-[-20px_4px_40px_0px_#DBFFAA40] rounded-lg hover:opacity-90 transition-opacity duration-200 text-center">
+                  Dashboard
+                </Link>
+              ) : (
+                <Link href="/login" className="w-full px-6 py-3 text-sm font-medium text-black bg-gradient-to-r from-green-primary via-green-foreground to-green-secondary shadow-[-20px_4px_40px_0px_#DBFFAA40] rounded-lg hover:opacity-90 transition-opacity duration-200 text-center">
+                  Get Started
+                </Link>
+              )}
             </li>
           </ul>
         </div>
