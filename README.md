@@ -1,197 +1,137 @@
 # Morphlyca Frontend
 
-Next.js frontend application for Morphlyca platform with PrimeAuth integration and Docker support.
+Frontend aplikasi Morphlyca - platform AI untuk face swapping dan image processing dengan teknologi Next.js dan integrasi PrimeAuth.
 
-## 🚀 Quick Start
+**🌐 Production URL:** https://morphlyca.meetaza.com
+
+## � About Project
+
+Morphlyca adalah platform AI yang memungkinkan pengguna untuk melakukan face swapping dan image processing menggunakan teknologi machine learning. Frontend ini dibangun dengan:
+
+- **Next.js 14** - React framework dengan App Router
+- **TypeScript** - Type safety dan better development experience  
+- **Tailwind CSS** - Utility-first CSS framework
+- **Shadcn/UI** - Modern component library
+- **PrimeAuth** - Authentication service integration
+- **Docker** - Containerized deployment
+
+### Features
+- 🔐 **Authentication** - Login dengan PrimeAuth
+- 👤 **User Management** - Admin panel untuk manage users
+- 🎨 **Face Swapping** - AI-powered face swap functionality
+- 📱 **Responsive Design** - Mobile-friendly interface
+- 🖼️ **Media Library** - File management dengan MinIO integration
+- 📊 **Analytics** - Job tracking dan user analytics
+- ⚙️ **Admin Dashboard** - Complete admin management system
+
+## � Deployment
+
+Aplikasi ini menggunakan Docker image yang sudah di-build dan tersedia di Docker Hub.
 
 ### Prerequisites
 - Docker & Docker Compose
-- Git
+- File `.env.production` dengan konfigurasi yang sesuai
 
-### Clone & Run
+### Quick Deploy
+
+1. **Clone repository**
 ```bash
 git clone https://github.com/meetaza/morphlyca-fe.git
 cd morphlyca-fe
 ```
 
-#### Development Mode
+2. **Start application**
 ```bash
-# Linux/macOS
-./docker.sh dev
-
-# Windows
-.\docker.bat dev
-
-# Windows (jika ada masalah permission)
-.\docker.bat dev-simple
-# atau langsung:
-docker-compose -f docker-compose.simple.yml up --build
+docker-compose up -d
 ```
 
-#### Production Mode
+3. **Update ke versi terbaru**
 ```bash
-# Linux/macOS
-./docker.sh prod
-
-# Windows
-.\docker.bat prod
+docker-compose pull
+docker-compose up -d
 ```
 
-**Frontend URL:** http://localhost:3001
+Aplikasi akan berjalan di port 3001.
 
-## 🖥️ VM Deployment Guide
+## 🔧 Environment Configuration
 
-### 1. Server Requirements
-- **OS:** Ubuntu 20.04+ / CentOS 7+ / RHEL 8+
-- **RAM:** Minimum 2GB (Recommended 4GB+)
-- **CPU:** 2 cores minimum
-- **Storage:** 10GB+ free space
-- **Ports:** 3001 (frontend), 3000 (backend), 9000-9001 (MinIO), 5432 (PostgreSQL), 6379 (Redis)
-
-### 2. Install Docker on VM
-
-#### Ubuntu/Debian:
-```bash
-# Update package index
-sudo apt update
-
-# Install Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-
-# Install Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-
-# Add user to docker group
-sudo usermod -aG docker $USER
-```
-
-#### CentOS/RHEL:
-```bash
-# Install Docker
-sudo yum install -y yum-utils
-sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-sudo yum install -y docker-ce docker-ce-cli containerd.io
-
-# Install Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-
-# Start Docker
-sudo systemctl start docker
-sudo systemctl enable docker
-sudo usermod -aG docker $USER
-```
-
-**Logout and login again** after adding user to docker group.
-
-### 3. Deploy Application
+File `.env.production` berisi konfigurasi:
 
 ```bash
-# Clone repository
-git clone https://github.com/meetaza/morphlyca-fe.git
-cd morphlyca-fe
+# API URLs
+NEXT_PUBLIC_API_URL=https://api.morphlyca.meetaza.com
+NEXT_PUBLIC_FRONTEND_URL=https://morphlyca.meetaza.com
 
-# Copy environment file
-cp .env.example .env.local
+# PrimeAuth Configuration
+NEXT_PUBLIC_PRIMEAUTH_AUTH_SERVICE_URL=https://api.primeauth.meetaza.com/auth
+NEXT_PUBLIC_PRIMEAUTH_REALM_ID=7e4cb28a-decc-4300-aea8-1b3c091ccbfe
+NEXT_PUBLIC_PRIMEAUTH_CLIENT_ID=primeauth-MorphlycaDev
+NEXT_PUBLIC_PRIMEAUTH_REDIRECT_URI=http://morphlyca.meetaza.com/auth/callback
 
-# Edit environment variables
-nano .env.local
-```
-
-### 4. Configure Environment Variables
-
-Update `.env.local` with your VM's IP address:
-
-```bash
-# Replace localhost with your VM's IP address
-NEXT_PUBLIC_API_URL=http://YOUR_VM_IP:3000
-NEXT_PUBLIC_FRONTEND_URL=http://YOUR_VM_IP:3001
-NEXT_PUBLIC_PRIMEAUTH_REDIRECT_URI=http://YOUR_VM_IP:3000/auth/callback
-
-# MinIO public URL
-NEXT_PUBLIC_MINIO_PUBLIC_BASE=http://YOUR_VM_IP:9000
-
-# S3/MinIO configuration
-S3_ENDPOINT=http://YOUR_VM_IP:9000
+# MinIO Storage
+S3_ENDPOINT=http://192.168.210.14:9000
 S3_ACCESS_KEY=minioadmin
 S3_SECRET_KEY=minioadmin
-S3_OUTPUT_BUCKET=facefusion-output
-
-# PrimeAuth configuration (keep as is)
-NEXT_PUBLIC_PRIMEAUTH_AUTH_SERVICE_URL=https://api.primeauth.meetaza.com/auth
-NEXT_PUBLIC_PRIMEAUTH_REALM_ID=8930ef74-b6cf-465a-9a74-8f9cc591c3e3
-NEXT_PUBLIC_PRIMEAUTH_CLIENT_ID=primeauth-admin
-NEXT_PUBLIC_PRIMEAUTH_TOKEN_URL=https://api.primeauth.meetaza.com/auth/realms/8930ef74-b6cf-465a-9a74-8f9cc591c3e3/protocol/openid-connect/token
+NEXT_PUBLIC_MINIO_PUBLIC_BASE=http://192.168.210.14:9000
 ```
 
-### 5. Start Services
+## 🏗️ Development
 
+### Local Development Setup
+
+1. **Install dependencies**
 ```bash
-# Start production environment
-./docker.sh prod-detached
-
-# Or for development
-./docker.sh dev-detached
+npm install
 ```
 
-### 6. Configure Firewall
-
-#### Ubuntu (UFW):
+2. **Copy environment file**
 ```bash
-sudo ufw allow 3001/tcp  # Frontend
-sudo ufw allow 3000/tcp  # Backend (if needed)
-sudo ufw allow 9000/tcp  # MinIO API
-sudo ufw allow 9001/tcp  # MinIO Console
-sudo ufw reload
+cp .env.example .env.local
 ```
 
-#### CentOS/RHEL (firewalld):
+3. **Run development server**
 ```bash
-sudo firewall-cmd --permanent --add-port=3001/tcp  # Frontend
-sudo firewall-cmd --permanent --add-port=3000/tcp  # Backend
-sudo firewall-cmd --permanent --add-port=9000/tcp  # MinIO API
-sudo firewall-cmd --permanent --add-port=9001/tcp  # MinIO Console
-sudo firewall-cmd --reload
+npm run dev
 ```
 
-### 7. Verify Deployment
+Aplikasi akan berjalan di http://localhost:3000
 
-```bash
-# Check containers status
-docker ps
-
-# Check logs
-./docker.sh logs
-
-# Test frontend
-curl http://YOUR_VM_IP:3001
+### Project Structure
 ```
-
-**Access application:** http://YOUR_VM_IP:3001
+src/
+├── app/                 # Next.js App Router pages
+│   ├── admin/          # Admin dashboard pages
+│   ├── api/            # API routes
+│   ├── auth/           # Authentication pages
+│   └── login/          # Login page
+├── components/         # Reusable components
+│   ├── admin/          # Admin-specific components
+│   └── ui/             # UI components (shadcn/ui)
+├── hooks/              # Custom React hooks
+├── lib/                # Utility libraries
+├── types/              # TypeScript type definitions
+└── middleware.ts       # Next.js middleware
+```
 
 ## 🔧 Management Commands
 
-### Application Management
+### Production Management
 ```bash
 # Start services
-./docker.sh prod-detached
+docker-compose up -d
 
-# Stop services
-./docker.sh stop
+# Stop services  
+docker-compose down
 
 # View logs
-./docker.sh logs
+docker-compose logs -f
 
-# Restart services
-./docker.sh stop && ./docker.sh prod-detached
+# Update to latest version
+docker-compose pull
+docker-compose up -d
 
-# Update application
-git pull origin main
-./docker.sh stop
-./docker.sh clean
-./docker.sh prod-detached
+# Restart specific service
+docker-compose restart morphlyca-frontend
 ```
 
 ### Monitoring
@@ -199,162 +139,38 @@ git pull origin main
 # Check container status
 docker ps
 
-# Check resource usage
-docker stats
-
-# Check logs for specific service
-docker logs morphlyca-frontend
-docker logs morphlyca-backend
-docker logs morphlyca-minio
-```
-
-### Backup & Restore
-```bash
-# Backup volumes
-docker run --rm -v morphlyca-fe_postgres_data:/data -v $(pwd):/backup alpine tar czf /backup/postgres-backup.tar.gz -C /data .
-docker run --rm -v morphlyca-fe_minio_data:/data -v $(pwd):/backup alpine tar czf /backup/minio-backup.tar.gz -C /data .
-
-# Restore volumes
-docker run --rm -v morphlyca-fe_postgres_data:/data -v $(pwd):/backup alpine tar xzf /backup/postgres-backup.tar.gz -C /data
-docker run --rm -v morphlyca-fe_minio_data:/data -v $(pwd):/backup alpine tar xzf /backup/minio-backup.tar.gz -C /data
-```
-
-## 🛠️ Troubleshooting
-
-### Common Issues
-
-#### 1. Port Already in Use
-```bash
-# Check what's using the port
-sudo netstat -tlnp | grep :3001
-
-# Kill process using port
-sudo kill -9 <PID>
-```
-
-#### 2. Permission Denied
-```bash
-# Fix Docker permissions
-sudo chown -R $USER:$USER /var/run/docker.sock
-sudo systemctl restart docker
-```
-
-#### 3. Out of Disk Space
-```bash
-# Clean Docker resources
-docker system prune -a
-docker volume prune
-```
-
-#### 4. Container Won't Start
-```bash
 # Check logs
-./docker.sh logs
+docker logs morphlyca-frontend
 
-# Rebuild containers
-./docker.sh clean
-./docker.sh prod-detached
+# Monitor resources
+docker stats
 ```
 
-#### 5. ESLint/TypeScript Build Errors
-```bash
-# Jika build gagal karena ESLint errors:
+## 🛠️ Technology Stack
 
-# Solusi 1: Build sudah dikonfigurasi untuk ignore errors
-# File next.config.ts sudah diset untuk ignoreDuringBuilds: true
-
-# Solusi 2: Jika masih error, cek logs
-docker logs container_name
-
-# Solusi 3: Build dengan skip validation
-docker build --build-arg SKIP_ENV_VALIDATION=1 .
-```
-
-#### 6. Authentication Issues
-```bash
-# Debug authentication problems:
-
-# 1. Check if backend API is accessible
-curl http://YOUR_VM_IP:3000/auth/debug-config
-
-# 2. Test manual login endpoint
-curl -X POST http://YOUR_VM_IP:3000/auth/prime/manual-login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"test@example.com","password":"testpass"}'
-
-# 3. Check PrimeAuth configuration
-curl http://YOUR_VM_IP:3000/auth/test-primeauth
-
-# 4. Check browser console for errors during auth flow
-# Open DevTools → Console when testing login
-
-# 5. Common fixes:
-# - Update NEXT_PUBLIC_API_URL to correct backend URL
-# - Ensure backend CORS allows frontend domain
-# - Check cookie domain settings match
-# - Verify PrimeAuth realm and client configuration
-```
-
-#### 7. Windows Permission Issues
-```powershell
-# Jika error "Access is denied" di Windows:
-
-# Solusi 1: Jalankan PowerShell sebagai Administrator
-.\docker.bat dev-simple
-
-# Solusi 2: Gunakan docker-compose langsung
-docker-compose -f docker-compose.simple.yml up --build
-
-# Solusi 3: Fix Docker Desktop File Sharing
-# Buka Docker Desktop → Settings → Resources → File Sharing
-# Add C:\Users\[USERNAME]\Documents
-
-# Solusi 4: Fix folder permission
-icacls "C:\Users\Asyam\Documents\morphlyca-fe" /grant:r %USERNAME%:F
-```
-
-#### 6. Can't Access from External IP
-- Check firewall settings
-- Verify environment variables have correct IP
-- Ensure Docker containers are binding to 0.0.0.0
-
-### Health Checks
-```bash
-# Frontend health
-curl http://YOUR_VM_IP:3001/api/health
-
-# MinIO health
-curl http://YOUR_VM_IP:9000/minio/health/live
-```
-
-## 📋 Service URLs
-
-| Service | URL | Description |
-|---------|-----|-------------|
-| Frontend | http://YOUR_VM_IP:3001 | Main application |
-| Backend API | http://YOUR_VM_IP:3000 | Backend services |
-| MinIO Console | http://YOUR_VM_IP:9001 | File storage admin |
-| MinIO API | http://YOUR_VM_IP:9000 | File storage API |
-
-## 🔐 Default Credentials
-
-### MinIO
-- **Username:** minioadmin
-- **Password:** minioadmin
-
-**⚠️ Change these in production!**
+- **Frontend Framework:** Next.js 14 with App Router
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS + Shadcn/UI components
+- **Authentication:** PrimeAuth integration
+- **State Management:** React hooks + Context API
+- **HTTP Client:** Axios
+- **Icons:** Lucide React
+- **Deployment:** Docker containers
+- **Storage:** MinIO integration for file management
 
 ## 📞 Support
 
-### Logs Location
-- Application logs: `./docker.sh logs`
-- System logs: `/var/log/docker/`
+### Health Check
+```bash
+# Check application health
+curl https://morphlyca.meetaza.com/api/health
+```
 
-### Maintenance
-- Update: `git pull && ./docker.sh stop && ./docker.sh clean && ./docker.sh prod-detached`
-- Backup: See backup commands above
-- Monitor: `docker stats` and `docker ps`
+### Common Issues
+- **Container won't start:** Check logs with `docker-compose logs -f`
+- **Authentication issues:** Verify PrimeAuth configuration in environment variables
+- **File upload issues:** Check MinIO connectivity and credentials
 
 ---
 
-**🚀 Happy Deploying!**
+**🚀 Morphlyca Frontend - AI-Powered Face Swapping Platform**
