@@ -481,6 +481,17 @@ export default function ExplorePage() {
           } catch {}
           // refresh job history after completion
           await fetchJobHistory();
+          
+          // Clear source and target files when job succeeds
+          if (j.status === "SUCCEEDED") {
+            setSourceFile(null);
+            setSourcePreview("");
+            setTargetFile(null);
+            setTargetPreview("");
+            // Optionally clear audio file too
+            setAudioFile(null);
+            setAudioPreview("");
+          }
         }
       } catch (e) {
         console.error(e);
