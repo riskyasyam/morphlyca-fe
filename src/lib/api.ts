@@ -1,7 +1,39 @@
 import axios from "axios";
 
+// Get API URL with fallback logic
+const getApiUrl = () => {
+  // First try env variable
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  
+  // Fallback: detect environment based on hostname
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    
+    // Production
+    if (hostname.includes('morphlyca.meetaza.com')) {
+      return 'https://api.morphlyca.meetaza.com';
+    }
+    
+    // Local development
+    return 'http://localhost:3000';
+  }
+  
+  // SSR fallback
+  return 'http://localhost:3000';
+};
+
+const API_URL = getApiUrl();
+
+// Log for debugging
+if (typeof window !== 'undefined') {
+  console.log('🌐 API BaseURL:', API_URL);
+  console.log('🌐 Current hostname:', window.location.hostname);
+}
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: API_URL,
   withCredentials: true,
 });
 
